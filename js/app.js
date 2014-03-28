@@ -1,4 +1,6 @@
 
+// icons:: https://www.iconfinder.com/search/?q=iconset:jigsoar-icons
+
 
 (function(exports){
 
@@ -8,30 +10,25 @@
         var context;
         var toolActive = false;
         var wasMove = false;
-        
-        var selectedTool = "draw";
+        var currentColor = "#FFF";
+        var selectedTool;
 
-        var pixelSize = 40;
-        var halfPixel = 0;//pixelSize / 2;
+
+        var pxSz = 40;
+        var halfPixel = 0;//pxSz / 2;
 
         exports.init = function()
         {
+            toolBtnColor.style.borderColor = currentColor;
+
             canvasList.push(document.getElementById("c1"));
             currentCanvas = canvasList[0];
             context = currentCanvas.getContext('2d');
-            context.width = 500;
-            context.height = 500;
-            context.clearRect(0,0,500,500);
-            context.strokeStyle = "#000";
-            context.beginPath();
-            for(var x =halfPixel; x< 500; x+=pixelSize) {
-                for(var y = halfPixel;y < 500; y+= pixelSize) {
-                    context.fillRect(x,y,pixelSize,pixelSize);
-                    context.strokeRect(x,y,pixelSize,pixelSize);
-                }
-            }
-            context.stroke();
-            context.closePath();
+            context.width = 480;
+            context.height = 640;
+            
+            clearCanvas(0);
+
             canvasHolder.addEventListener("pointerdown",onToolStart);
             canvasHolder.addEventListener("pointermove", onToolMove);
             canvasHolder.addEventListener("pointerup",  onToolEnd);
@@ -44,6 +41,24 @@
             }
             
             onToolBtn({target:btns[0]});
+
+            clrPicker.onclick = onColorPicker;
+        }
+
+        function clearCanvas(clr) {
+
+            context.clearRect(0,0,480,640);
+            context.fillStyle = clr || "#000";
+            context.strokeStyle = "#333";
+            context.beginPath();
+            for(var x =halfPixel; x < 480; x+=pxSz) {
+                for(var y = halfPixel;y < 640; y+= pxSz) {
+                    context.fillRect(x,y,pxSz,pxSz);
+                    context.strokeRect(x,y,pxSz,pxSz);
+                }
+            }
+            context.stroke();
+            context.closePath();
         }
         
         function onToolBtn(e)
@@ -58,6 +73,7 @@
             switch(e.target.id) 
             {
                 case "toolBtnMove" : 
+                    selectedTool = e.target;
                     break;
                 case "toolBtnUndo" : 
                     
@@ -70,8 +86,19 @@
                     }
                     showColorPicker(true);
                     break;
+                case "toolBtnExport" :
+                    console.log(currentCanvas.toDataURL("image/png", ""));
+                    break;
+                case "toolBtnSettings": 
+                    break;
                 case "toolBtnDraw" : 
-                    
+                    selectedTool = e.target;
+                    break;
+                case "toolBtnDelete" : 
+                    clearCanvas();
+                    break;
+                case "toolBtnZoom" :
+                    selectedTool = e.target; 
                     break;
                 
                 
@@ -81,38 +108,59 @@
             e.target.style.backgroundColor = "#884466";
         
         }
+
+        function onColorPicker(evt) {
+            toolBtnColor.active = false;
+            currentColor = evt.target.style.backgroundColor;
+            toolBtnColor.style.borderColor = currentColor;
+            showColorPicker(false);
+
+            selectedTool.active = true;
+            selectedTool.style.backgroundColor = "#884466";
+        }
+
+        function removeSelection() {
+            toolBtnColor.style.backgroundColor = "#000";
+            setTimeout(function(){
+                showColorPicker(false);
+            },10);
+        }
+
+        function createColorPicker() {
+            var pre = [0,128,255];
+            var colors = [];
+            var stride = pre.length;
+
+            for(var b = 0; b < stride; b++) {
+                for(var g = 0; g < stride; g++) {
+                    for(var r = 0; r < stride; r++) {
+                        colors.push("rgba(" + pre[r] + "," + pre[g] + "," + pre[b] + ",1.0)");
+                        colors.push("rgba(" + pre[r] + "," + pre[g] + "," + pre[b] + ",0.5)");  
+                    }
+                }
+            }
+                
+            for(var n = 0; n < colors.length; n++) {
+                var elem = document.createElement("div");
+                elem.style.backgroundColor = colors[n];
+                clrPicker.appendChild(elem);
+            }
+        }
         
         function showColorPicker(bShow)
         {
+            if(bShow) {
+                document.body.addEventListener("mouseup",removeSelection);
+                clrPicker.style.display = "block";
+            }
+            else {
+                document.body.removeEventListener("mouseup",removeSelection);
+                clrPicker.style.display = "none";
+            }
 
-            var elemWrap = document.querySelector("#clrPicker");
-
-            if(!bShow) { // hide it
-                elemWrap.innerHTML = "";
-                return;
+            if(clrPicker.children.length == 0) {
+                createColorPicker();
             }
-            
-            var pre = ["00","66","AA","FF"];
-            var colors = [];
-            
-            for(var red = 0; red < 256; red+=64) {
-                for(var green = 0; green < 256; green+=64) {
-                    for(var blue = 0; blue < 256; blue += 64) {
-                        colors.push("rgb("+ red + "," + green + "," + blue + ")");
-                     }
-                }
-            }
-            
-            for(var n = 0; n < colors.length; n++)
-            {
-                var elem = document.createElement("span");
-                elem.style.backgroundColor = colors[n];
-                console.log("color = " + colors[n]);
-                elem.style.width = "12px";
-                elem.style.height = "12px";
-                elemWrap.appendChild(elem);
-            }
-            
         }
 
         function updateDebugText(x,y)
@@ -128,14 +176,7 @@
             e.preventDefault();
             context.save();
 
-            var clr = Math.floor( Math.random() * 256 * 256 * 256 );
-            var r = ( clr >> 16 )  % 256 ;
-            var g = ( clr >> 8 ) % 256;
-            var b = clr % 256;
-
-            var cssColor = "rgba(" + r + "," + g + "," + b + " ,0.5)";
-
-            context.fillStyle = cssColor;
+            context.fillStyle = currentColor;
             toolActive = true;
             wasMove = false;
             context.beginPath();
@@ -144,12 +185,12 @@
         function onToolClick(e) {
             if(!wasMove) {
 
-                var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pixelSize );// - e.currentTarget.offsetLeft;
-                var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pixelSize );// - e.currentTarget.offsetTop;
+                var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );// - e.currentTarget.offsetLeft;
+                var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );// - e.currentTarget.offsetTop;
 
                 context.beginPath();
-                context.fillRect(x * pixelSize,y*pixelSize,pixelSize,pixelSize);
-                context.strokeRect(x * pixelSize,y*pixelSize,pixelSize,pixelSize);
+                context.fillRect(x * pxSz,y*pxSz,pxSz,pxSz);
+                context.strokeRect(x * pxSz,y*pxSz,pxSz,pxSz);
                 context.stroke();
                 context.closePath();
             }
@@ -161,12 +202,12 @@
 
                 e.preventDefault();
 
-                var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pixelSize );
-                var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pixelSize );
+                var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
+                var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
 
                 if(x != startX || y != startY) {
-                    context.fillRect(x * pixelSize,y*pixelSize,pixelSize,pixelSize);
-                	context.strokeRect(x * pixelSize,y*pixelSize,pixelSize,pixelSize);
+                    context.fillRect(x * pxSz,y*pxSz,pxSz,pxSz);
+                	context.strokeRect(x * pxSz,y*pxSz,pxSz,pxSz);
                     wasMove = true;
                 }
 

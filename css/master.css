@@ -21,8 +21,8 @@ body
 {
 	top:20px;
 	/*position: absolute;*/
-	width:600px;
-	height:600px;
+	width:1480px;
+	height:800px;
 	background-color:#333;
 	overflow:hidden;
 	border:solid 0px #000;
@@ -31,15 +31,24 @@ body
 #clrPicker
 {
     z-index:100;
+    max-width:256px;
     position:absolute;
-
+    background-color:#000;
+    top:64px;
+    margin:0 0;
+    padding:0 0;
 }
 
-#clrPicker > span
+#clrPicker > div
 {
-    width:20px;
-    height:20px;
-    border:solid 1px Green;
+    width:49px;
+    height:49px;
+    min-width:49px;
+    min-height:49px;
+    border:solid 1px Black;
+    display:inline-block;
+    margin:0px;
+    padding:0px;
 }
 
 #toolBar
@@ -54,34 +63,79 @@ body
 #toolBar > div
 {
     background-color:#999;
-    border:solid 3px rgba(0,0,0,0);
+    border:solid 1px rgba(0,0,0,1.0);
     padding:4px 2px;
     display:table-cell;
     width:48px;
     height:48px;
     line-height:48px;
     text-align:center;
+    background-repeat: no-repeat;
+    background-position:2px 3px;
+    min-width:48px;
+    min-height:48px;
 
 }
 
+#toolBtnMove
+{
+    background-image:url(../assets/48_move.png);
+}
+
+#toolBtnUndo 
+{
+    background-image:url(../assets/48_undo2.png);
+}
+
+#toolBtnColor
+{
+    background-image:url(../assets/48_themes.png);
+}
+
+#toolBtnDraw
+{
+    background-image:url(../assets/48_edit.png);
+}
+
+#toolBtnSettings
+{
+    background-image:url(../assets/48_settings.png);
+}
+
+#toolBtnExport
+{
+    background-image:url(../assets/48_upload.png);
+}
+
+#toolBtnZoom 
+{
+    background-image:url(../assets/48_search.png);
+}
+
+#toolBtnDelete
+{
+    background-image:url(../assets/48_close.png);
+}
+
+
 .activeToolBtn
 {
-    background-color:#999000;
+    background-color:#990000;
 }
 
 #canvasHolder
 {
 /*    position:absolute;*/
-	background-color:#000;
+	background-color:#333;
 /*  left:0px;
     top:0px;*/
-	margin:0 0;
+	margin:0 auto;
 	padding:0 0;
+    width:640px;
 
 }
 
 canvas
 {
-    width:500px;
-    height:500px;
+    margin:0 auto;
 }
