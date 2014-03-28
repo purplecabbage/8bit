@@ -21,59 +21,64 @@ body
 {
 	top:20px;
 	/*position: absolute;*/
-	width:1480px;
+	width:480px;
 	height:800px;
 	background-color:#333;
-	overflow:hidden;
-	border:solid 0px #000;
+	/*overflow:hidden;*/
 }
 
 #clrPicker
 {
     z-index:100;
-    max-width:256px;
+    left:20px;
+    right:20px;
     position:absolute;
-    background-color:#000;
-    top:64px;
-    margin:0 0;
-    padding:0 0;
+    background-color:#111;
+    top:62px;
+    margin:0 auto;
+    padding:10px 10px;
+    border:solid 1px #333;
 }
 
 #clrPicker > div
 {
-    width:49px;
-    height:49px;
-    min-width:49px;
-    min-height:49px;
-    border:solid 1px Black;
+    width:48px;
+    height:48px;
+    min-width:48px;
+    min-height:48px;
     display:inline-block;
-    margin:0px;
-    padding:0px;
+    margin:2px 2px;
+    padding:8px 8px;
 }
 
 #toolBar
 {
-	width:100%;
+	width:480px;
+    min-width:480px;
 	height:60px;
-	position: relative;
+	/*position: relative;*/
 	background-color: #333;
-
+    display:inline-table;
 }
 
-#toolBar > div
+#toolBar div
 {
-    background-color:#999;
+    background-color:#99F;
     border:solid 1px rgba(0,0,0,1.0);
+    margin:0 auto;
     padding:4px 2px;
+
     display:table-cell;
-    width:48px;
-    height:48px;
+/*    width:48px;
+    height:48px;*/
+    min-width:48px;
+    min-height:48px;
+
     line-height:48px;
     text-align:center;
     background-repeat: no-repeat;
-    background-position:2px 3px;
-    min-width:48px;
-    min-height:48px;
+    background-position:center center;
+
 
 }
 
@@ -125,14 +130,10 @@ body
 
 #canvasHolder
 {
-/*    position:absolute;*/
-	background-color:#333;
-/*  left:0px;
-    top:0px;*/
+	background-color:#111;
 	margin:0 auto;
 	padding:0 0;
-    width:640px;
-
+    width:480px;
 }
 
 canvas

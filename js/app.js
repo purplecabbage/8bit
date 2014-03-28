@@ -21,7 +21,7 @@
         {
             toolBtnColor.style.borderColor = currentColor;
 
-            canvasList.push(document.getElementById("c1"));
+            canvasList.push(drawCanvas);
             currentCanvas = canvasList[0];
             context = currentCanvas.getContext('2d');
             context.width = 480;
@@ -135,7 +135,7 @@
                 for(var g = 0; g < stride; g++) {
                     for(var r = 0; r < stride; r++) {
                         colors.push("rgba(" + pre[r] + "," + pre[g] + "," + pre[b] + ",1.0)");
-                        colors.push("rgba(" + pre[r] + "," + pre[g] + "," + pre[b] + ",0.5)");  
+                        //colors.push("rgba(" + pre[r] + "," + pre[g] + "," + pre[b] + ",0.5)");  
                     }
                 }
             }
