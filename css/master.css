@@ -29,6 +29,7 @@ body
 
 #clrPicker
 {
+    display:none;
     z-index:100;
     left:20px;
     right:20px;
@@ -120,12 +121,6 @@ body
 #toolBtnDelete
 {
     background-image:url(../assets/48_close.png);
-}
-
-
-.activeToolBtn
-{
-    background-color:#990000;
 }
 
 #canvasHolder

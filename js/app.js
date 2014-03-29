@@ -21,28 +21,32 @@
         {
             toolBtnColor.style.borderColor = currentColor;
 
+            initCanvas();
+            
+            var btns = document.querySelectorAll("#toolBar div");
+            for(var n = 0; n<btns.length; n++) {
+                btns[n].addEventListener('click',onToolBtn);
+            }
+            
+            onToolBtn({target:btns[0]});
+            clrPicker.onclick = onColorPicker;
+        }
+
+        function initCanvas() {
+
             canvasList.push(drawCanvas);
             currentCanvas = canvasList[0];
             context = currentCanvas.getContext('2d');
             context.width = 480;
             context.height = 640;
             
-            clearCanvas(0);
+            clearCanvas();
 
             canvasHolder.addEventListener("pointerdown",onToolStart);
             canvasHolder.addEventListener("pointermove", onToolMove);
             canvasHolder.addEventListener("pointerup",  onToolEnd);
             canvasHolder.addEventListener("click",  onToolClick);
             
-            var btns = document.querySelectorAll("#toolBar div");
-            for(var n = 0; n<btns.length; n++)
-            {
-                btns[n].addEventListener('click',onToolBtn);
-            }
-            
-            onToolBtn({target:btns[0]});
-
-            clrPicker.onclick = onColorPicker;
         }
 
         function clearCanvas(clr) {
