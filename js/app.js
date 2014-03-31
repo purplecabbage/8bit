@@ -14,11 +14,17 @@
         var selectedTool;
 
         var pixelData;
-        var pxSz = 40;
+        var defaultPixelSize = 8;
+        var zoomRatio = 4.0;
+        var canvasWidth = 480;
+        var canvasHeight = 640;
+
+        var offsetX = 0;
+        var offsetY = 0;
 
         var undoStack = [];
 
-        exports.init = function()
+        exports.init = function ()
         {
             toolBtnColor.style.borderColor = currentColor;
 
@@ -31,6 +37,11 @@
             
             onToolBtn({target:btns[0]});
             clrPicker.onclick = onColorPicker;
+
+        }
+
+        function getPixelSize() {
+            return defaultPixelSize * 1;//zoomRatio;
         }
 
         function initCanvas() {
@@ -38,8 +49,8 @@
             canvasList.push(drawCanvas);
             currentCanvas = canvasList[0];
             context = currentCanvas.getContext('2d');
-            context.width = 480;
-            context.height = 640;
+            context.width = canvasWidth;
+            context.height = canvasHeight;
             
             clearCanvas();
 
@@ -47,26 +58,49 @@
             canvasHolder.addEventListener("pointermove", onToolMove);
             canvasHolder.addEventListener("pointerup",  onToolEnd);
             canvasHolder.addEventListener("click",  onToolClick);
-            
         }
 
         function clearCanvas(clr) {
+            pixelData = [];
+            for(var i = 0; i < canvasWidth / 2; i++) {
+                    pixelData[i] = [];
+                for(var j = 0; j < canvasHeight / 2; j++) {
+                    pixelData[i][j] = 0;
+                }
+            }
+            redraw(clr);
+        }
 
-            context.clearRect(0,0,480,640);
-            context.fillStyle = clr || "#000";
+        function redraw() {
+
+            offsetX = Math.max(offsetX,0);
+            offsetY = Math.max(offsetY,0);
+
+            context.clearRect(0,0,canvasWidth,canvasHeight);
+            context.fillStyle = "#000";
             context.strokeStyle = "#333";
             context.beginPath();
-            pixelData = [];
 
-            var pX = Math.ceil(480 / pxSz);
-            var pY = Math.ceil(640 / pxSz);
+            var pxSz = getPixelSize();
+            var pX = Math.ceil(canvasWidth / pxSz);
+            var pY = Math.ceil(canvasHeight / pxSz);
 
-            for (var x = 0; x < pX; x++) {
-                pixelData[x] = [];
-                for (var y = 0; y < pY; y++) {
-                    pixelData[x][y] = 0;//context.fillStyle;
-                    context.fillRect(x * pxSz, y * pxSz, pxSz, pxSz);
-                    context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
+            // offsetX = Math.min(offsetX,200);
+            // offsetY = Math.min(offsetY,200);
+
+            var xCount = pixelData.length;
+            var yCount = pixelData[0].length;
+
+            console.log("xCount = " + xCount);
+
+            for (var x = 0; x < xCount; x++) {
+                for (var y = 0; y < yCount; y++) {
+                    var adjX = x;// - offsetX;
+                    var adjY = y;// - offsetY;
+
+                    context.fillStyle = pixelData[x][y] || ( (x % 10 == 0 || y % 10 == 0) ? "#111" : "#000");
+                    context.fillRect(adjX * pxSz, adjY * pxSz, pxSz, pxSz);
+                    context.strokeRect(adjX * pxSz, adjY * pxSz, pxSz, pxSz);
                 }
             }
             context.stroke();
@@ -80,6 +114,7 @@
             var tempCanvas = document.createElement("canvas");
             tempCanvas.width = pixelData.length * mux;
             tempCanvas.height = pixelData[0].length * mux;
+
 // Not required to export data, but a HUD might be nice ...
 /*
             tempCanvas.style.position = "absolute";
@@ -106,10 +141,16 @@
             }
 
             ctx.closePath();
+            
+            var imgData = tempCanvas.toDataURL("image/png", "");
 
-            window.open(tempCanvas.toDataURL("image/png", ""));
-     
-
+            // are we in a cordova app with a saveImageToCameraRoll method?
+            try {
+                window.device.saveImageDataToCameraRoll(null,null,tempCanvas.toDataURL());
+            }
+            catch(e) {
+                window.open(imgData);
+            }
         }
         
         function onToolBtn(e)
@@ -150,6 +191,7 @@
                     break;
                 case "toolBtnZoom" :
                     selectedTool = e.target; 
+                    doZoom();
                     break;
                 
                 
@@ -158,6 +200,14 @@
             e.target.active = true;
             e.target.style.backgroundColor = "#884466";
         
+        }
+
+        function doZoom() {
+            zoomRatio *= 1.5;
+            if(zoomRatio > 32) {
+                zoomRatio = 1.0;
+            }
+            redraw();
         }
 
         function onColorPicker(evt) {
@@ -178,7 +228,7 @@
         }
 
         function createColorPicker() {
-            var pre = [0,128,255];
+            var pre = [0,128,256];
             var colors = [];
             var stride = pre.length;
 
@@ -186,10 +236,17 @@
                 for(var g = 0; g < stride; g++) {
                     for(var r = 0; r < stride; r++) {
                         colors.push("rgba(" + pre[r] + "," + pre[g] + "," + pre[b] + ",1.0)");
-                        //colors.push("rgba(" + pre[r] + "," + pre[g] + "," + pre[b] + ",0.5)");  
+                        colors.push("rgba(" + pre[r]/2 + "," + pre[g]/2 + "," + pre[b] /2+ ",1.0)");  
                     }
                 }
             }
+
+            colors = colors.filter(function(elem, pos) {
+                return colors.indexOf(elem) == pos;
+            });
+
+            colors.sort();
+            console.log("colors.length = " + colors.length);
                 
             for(var n = 0; n < colors.length; n++) {
                 var elem = document.createElement("div");
@@ -219,20 +276,6 @@
             //toolBar.innerText = startX + "," + startY + "," + x + "," + y;
         }
 
-        function onToolStart(e)
-        {
-            // if(toolActive)
-            //     return;
-
-            e.preventDefault();
-            context.save();
-
-            context.fillStyle = currentColor;
-            toolActive = true;
-            wasMove = false;
-            context.beginPath();
-        }
-
         function setPixelColor(x,y,clr,noUndo) {
 
             if (!noUndo) {
@@ -250,6 +293,8 @@
                 var currentColor = context.fillStyle;
                 context.fillStyle = obj.clr || "#000";
 
+                var pxSz = getPixelSize();
+
                 context.beginPath();
                 context.fillRect(obj.x * pxSz, obj.y * pxSz, pxSz, pxSz);
                 context.strokeRect(obj.x * pxSz, obj.y * pxSz, pxSz, pxSz);
@@ -265,9 +310,33 @@
 
         }
 
-        function onToolClick(e) {
-            if(!wasMove) {
+        function onToolStart(e)
+        {
+            toolActive = true;
+            var pxSz = getPixelSize();
+            var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
+            var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
+            startX = x;
+            startY = y;
 
+            if(selectedTool == toolBtnMove) {
+                
+            }
+            else {
+                e.preventDefault();
+                context.save();
+
+                context.fillStyle = currentColor;
+                
+                wasPenDrag = false;
+                context.beginPath();
+            }
+        }
+
+        function onToolClick(e) {
+            if(!wasPenDrag) {
+
+                var pxSz = getPixelSize();
                 var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
                 var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
 
@@ -282,18 +351,35 @@
 
         function onToolMove(e)
         {
-            if(toolActive) {
+            if(!toolActive) {
+                return;
+            }
 
+
+            var pxSz = getPixelSize();
+            var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
+            var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
+
+            if(selectedTool == toolBtnMove) {
+
+                if(x != startX || y != startY) {
+                    offsetX -= x - startX;
+                    offsetY -= y - startY;
+                    redraw();
+                }
+                startX = x;
+                startY = y;
+            }
+            else {
+                
                 e.preventDefault();
 
-                var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
-                var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
 
                 if(x != startX || y != startY) {
                     context.fillRect(x * pxSz,y*pxSz,pxSz,pxSz);
                     context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
-                    setPixelColor(x, y, context.fillStyle);
-                    wasMove = true;
+                    setPixelColor(offsetX + x, offsetY + y, context.fillStyle);
+                    wasPenDrag = true;
                 }
 
                 context.stroke();
@@ -306,11 +392,16 @@
 
         function onToolEnd(e)
         {
-            e.preventDefault();
-            context.closePath();
             toolActive = false;
-            startX = -1;
-            startY = -1;
+                            startX = -1;
+                startY = -1;
+            if(selectedTool == toolBtnMove) {
+
+            }
+            else {
+                e.preventDefault();
+                context.closePath();
+            }
 
         }
 
