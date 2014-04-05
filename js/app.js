@@ -15,21 +15,25 @@
 
         var pixelData;
         var defaultPixelSize = 8;
-        var zoomRatio = 4.0;
-        var canvasWidth = 480;
-        var canvasHeight = 640;
+        var zoomRatio = 8.0;
+        var canvasWidth = 120;
+        var canvasHeight = 160;
 
         var offsetX = 0;
         var offsetY = 0;
 
         var undoStack = [];
 
-        exports.init = function ()
-        {
-            toolBtnColor.style.borderColor = currentColor;
-
-            initCanvas();
+        exports.init = function () {
             
+            initCanvas();
+            initAppBar();
+        }
+
+        function initAppBar() {
+
+            setCurrentColor(getCurrentColor());
+
             var btns = document.querySelectorAll("#toolBar div");
             for(var n = 0; n<btns.length; n++) {
                 btns[n].addEventListener('click',onToolBtn);
@@ -37,7 +41,6 @@
             
             onToolBtn({target:btns[0]});
             clrPicker.onclick = onColorPicker;
-
         }
 
         function getPixelSize() {
@@ -84,9 +87,6 @@
             var pxSz = getPixelSize();
             var pX = Math.ceil(canvasWidth / pxSz);
             var pY = Math.ceil(canvasHeight / pxSz);
-
-            // offsetX = Math.min(offsetX,200);
-            // offsetY = Math.min(offsetY,200);
 
             var xCount = pixelData.length;
             var yCount = pixelData[0].length;
@@ -210,10 +210,19 @@
             redraw();
         }
 
+        function getCurrentColor() {
+            return window.localStorage.currentColor || "#FF0F0F";
+        }
+
+        function setCurrentColor(clr) {
+            window.localStorage.currentColor = clr;
+            toolBtnColor.style.borderColor = currentColor;
+        }
+
         function onColorPicker(evt) {
             toolBtnColor.active = false;
-            currentColor = evt.target.style.backgroundColor;
-            toolBtnColor.style.borderColor = currentColor;
+            setCurrentColor(evt.target.style.backgroundColor);
+            
             showColorPicker(false);
 
             selectedTool.active = true;
@@ -310,8 +319,7 @@
 
         }
 
-        function onToolStart(e)
-        {
+        function onToolStart(e) {
             toolActive = true;
             var pxSz = getPixelSize();
             var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
@@ -326,7 +334,7 @@
                 e.preventDefault();
                 context.save();
 
-                context.fillStyle = currentColor;
+                context.fillStyle = getCurrentColor();
                 
                 wasPenDrag = false;
                 context.beginPath();
@@ -349,12 +357,10 @@
             }
         }
 
-        function onToolMove(e)
-        {
+        function onToolMove(e) {
             if(!toolActive) {
                 return;
             }
-
 
             var pxSz = getPixelSize();
             var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
@@ -390,8 +396,7 @@
             }
         }
 
-        function onToolEnd(e)
-        {
+        function onToolEnd(e) {
             toolActive = false;
                             startX = -1;
                 startY = -1;
