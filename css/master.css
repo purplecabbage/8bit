@@ -21,8 +21,8 @@ body
 #screen
 {
 	
-	width:480px;
-	height:800px;
+/*	width:480px;
+	height:800px;*/
 	background-color:#111;
 
     /*margin-top:-12px;*/
@@ -55,12 +55,13 @@ body
 
 #toolBar
 {
-	width:480px;
+	width:100%;
     min-width:480px;
+    max-width:640px;
 	height:60px;
 	background-color: #333;
-    display:inline-table;
-    margin:0 0;
+    display:table;
+    margin:0 auto;
     padding:0 0;
 }
 
@@ -72,10 +73,10 @@ body
     padding:4px 2px;
 
     display:table-cell;
-/*    width:48px;
-    height:48px;*/
     min-width:48px;
     min-height:48px;
+
+    max-width:60px;
 
     line-height:48px;
     text-align:center;
