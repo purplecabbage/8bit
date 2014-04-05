@@ -4,7 +4,6 @@
 
 (function(exports){
 
-        var canvasList = [];
         var startX,startY,currentTarget,selectedIndex = 0;
         var currentCanvas;
         var context;
@@ -28,6 +27,13 @@
             
             initCanvas();
             initAppBar();
+
+            window.addEventListener("resize",debounce(onResize,200));
+
+        }
+
+        function onResize(){
+            
         }
 
         function initAppBar() {
@@ -49,8 +55,7 @@
 
         function initCanvas() {
 
-            canvasList.push(drawCanvas);
-            currentCanvas = canvasList[0];
+            currentCanvas = drawCanvas
             context = currentCanvas.getContext('2d');
             context.width = canvasWidth;
             context.height = canvasHeight;
@@ -63,15 +68,15 @@
             canvasHolder.addEventListener("click",  onToolClick);
         }
 
-        function clearCanvas(clr) {
+        function clearCanvas() {
             pixelData = [];
-            for(var i = 0; i < canvasWidth / 2; i++) {
+            for(var i = 0; i < canvasWidth; i++) {
                     pixelData[i] = [];
-                for(var j = 0; j < canvasHeight / 2; j++) {
+                for(var j = 0; j < canvasHeight; j++) {
                     pixelData[i][j] = 0;
                 }
             }
-            redraw(clr);
+            redraw();
         }
 
         function redraw() {
@@ -88,16 +93,14 @@
             var pX = Math.ceil(canvasWidth / pxSz);
             var pY = Math.ceil(canvasHeight / pxSz);
 
-            var xCount = pixelData.length;
-            var yCount = pixelData[0].length;
-
-            console.log("xCount = " + xCount);
-
-            for (var x = 0; x < xCount; x++) {
-                for (var y = 0; y < yCount; y++) {
+            for (var x = 0; x < canvasWidth; x++) {
+                // if pixel x is offscreen, skip it
+                for (var y = 0; y < canvasHeight; y++) {
                     var adjX = x;// - offsetX;
                     var adjY = y;// - offsetY;
 
+                    // if pixel.y is onscreen, draw it
+                    // if it has pixel data, fill it, otherwise draw the grid
                     context.fillStyle = pixelData[x][y] || ( (x % 10 == 0 || y % 10 == 0) ? "#111" : "#000");
                     context.fillRect(adjX * pxSz, adjY * pxSz, pxSz, pxSz);
                     context.strokeRect(adjX * pxSz, adjY * pxSz, pxSz, pxSz);
