@@ -8,15 +8,16 @@
         var currentCanvas;
         var context;
         var toolActive = false;
+        var wasPenDrag = false;
         var wasMove = false;
         var currentColor = "#FFF";
         var selectedTool;
 
         var pixelData;
         var defaultPixelSize = 8;
-        var zoomRatio = 8.0;
-        var canvasWidth = 120;
-        var canvasHeight = 160;
+        var zoomRatio = 2.0;
+        var canvasWidth = 120; // in pixels
+        var canvasHeight = 160; // in pixels
 
         var offsetX = 0;
         var offsetY = 0;
@@ -47,10 +48,20 @@
             
             onToolBtn({target:btns[0]});
             clrPicker.onclick = onColorPicker;
+
+            divZoomOut.addEventListener("click",function(){
+                doZoom(-1);
+            });
+
+            divZoomIn.addEventListener("click",function(){
+                doZoom(1);
+            });
+
+            zoomVal.innerText = zoomRatio;
         }
 
         function getPixelSize() {
-            return defaultPixelSize * 1;//zoomRatio;
+            return defaultPixelSize * zoomRatio;
         }
 
         function initCanvas() {
@@ -93,11 +104,14 @@
             var pX = Math.ceil(canvasWidth / pxSz);
             var pY = Math.ceil(canvasHeight / pxSz);
 
+            console.log("pX = " + pX);
+
             for (var x = 0; x < canvasWidth; x++) {
                 // if pixel x is offscreen, skip it
+
                 for (var y = 0; y < canvasHeight; y++) {
-                    var adjX = x;// - offsetX;
-                    var adjY = y;// - offsetY;
+                    var adjX = x - offsetX;
+                    var adjY = y  - offsetY;
 
                     // if pixel.y is onscreen, draw it
                     // if it has pixel data, fill it, otherwise draw the grid
@@ -108,6 +122,10 @@
             }
             context.stroke();
             context.closePath();
+        }
+
+        function drawPixel( ) {
+
         }
 
         function exportImage() {
@@ -194,7 +212,12 @@
                     break;
                 case "toolBtnZoom" :
                     selectedTool = e.target; 
-                    doZoom();
+                    if(zoomBar.style.display == "table") {
+                        showZoomControls(false);
+                    }
+                    else {
+                        showZoomControls(true);
+                    }
                     break;
                 
                 
@@ -205,11 +228,35 @@
         
         }
 
-        function doZoom() {
-            zoomRatio *= 1.5;
+        function showZoomControls(bShow) {
+            if(bShow) {
+                //document.body.addEventListener("mouseup",removeSelection);
+                zoomBar.style.display = "table";
+            }
+            else {
+                //document.body.removeEventListener("mouseup",removeSelection);
+                zoomBar.style.display = "none";
+            }
+        }
+
+        function doZoom(dir) {
+            if(dir > 0) {
+                zoomRatio *= 1.5;
+            }
+            else {
+                zoomRatio /= 1.5;
+            }
+            
             if(zoomRatio > 32) {
                 zoomRatio = 1.0;
             }
+            if(zoomRatio < 1.0) {
+                zoomRatio = 32;
+            }
+
+            zoomRatio = Math.round(zoomRatio);
+
+            zoomVal.innerText = zoomRatio;
             redraw();
         }
 
@@ -236,6 +283,7 @@
             toolBtnColor.style.backgroundColor = "#000";
             setTimeout(function(){
                 showColorPicker(false);
+                showZoomControls(false);
             },10);
         }
 
@@ -345,7 +393,7 @@
         }
 
         function onToolClick(e) {
-            if(!wasPenDrag) {
+            if(!wasPenDrag) { // dragging the pen also fills pixels, so we ignore click events if the 'pen' moved
 
                 var pxSz = getPixelSize();
                 var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
@@ -361,6 +409,7 @@
         }
 
         function onToolMove(e) {
+            // need tool active for mouse-move support
             if(!toolActive) {
                 return;
             }
@@ -370,7 +419,6 @@
             var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
 
             if(selectedTool == toolBtnMove) {
-
                 if(x != startX || y != startY) {
                     offsetX -= x - startX;
                     offsetY -= y - startY;
@@ -382,8 +430,6 @@
             else {
                 
                 e.preventDefault();
-
-
                 if(x != startX || y != startY) {
                     context.fillRect(x * pxSz,y*pxSz,pxSz,pxSz);
                     context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
@@ -400,15 +446,16 @@
         }
 
         function onToolEnd(e) {
-            toolActive = false;
-                            startX = -1;
-                startY = -1;
+            toolActive = false; 
+            startX = -1;
+            startY = -1;
+
             if(selectedTool == toolBtnMove) {
 
             }
             else {
                 e.preventDefault();
-                context.closePath();
+                context.closePath(); // finish drawing
             }
 
         }
