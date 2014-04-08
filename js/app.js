@@ -97,7 +97,7 @@
 
             context.clearRect(0,0,canvasWidth,canvasHeight);
             context.fillStyle = "#000";
-            context.strokeStyle = "#333";
+            //context.strokeStyle = "#333";
             context.beginPath();
 
             var pxSz = getPixelSize();
@@ -115,12 +115,18 @@
 
                     // if pixel.y is onscreen, draw it
                     // if it has pixel data, fill it, otherwise draw the grid
-                    context.fillStyle = pixelData[x][y] || ( (x % 10 == 0 || y % 10 == 0) ? "#111" : "#000");
+                    if(pixelData[x][y]) {
+                        context.fillStyle = pixelData[x][y];
+                    }
+                    else {
+                        context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
+                    }
+                    
                     context.fillRect(adjX * pxSz, adjY * pxSz, pxSz, pxSz);
-                    context.strokeRect(adjX * pxSz, adjY * pxSz, pxSz, pxSz);
+                    //context.strokeRect(adjX * pxSz, adjY * pxSz, pxSz, pxSz);
                 }
             }
-            context.stroke();
+            //context.stroke();
             context.closePath();
         }
 
@@ -183,8 +189,7 @@
                 btns[n].style.backgroundColor = "Black";
             }
 
-            switch(e.target.id) 
-            {
+            switch(e.target.id) {
                 case "toolBtnMove" : 
                     selectedTool = e.target;
                     break;
@@ -211,16 +216,13 @@
                     clearCanvas();
                     break;
                 case "toolBtnZoom" :
-                    selectedTool = e.target; 
-                    if(zoomBar.style.display == "table") {
+                    if(e.target.active) {
+                        e.target.active = false;
                         showZoomControls(false);
+                        return;    
                     }
-                    else {
-                        showZoomControls(true);
-                    }
+                    showZoomControls(true);
                     break;
-                
-                
             }
 
             e.target.active = true;
@@ -246,12 +248,9 @@
             if(zoomRatio > 32) {
                 zoomRatio = 1.0;
             }
-            if(zoomRatio < 1.0) {
+            else if(zoomRatio < 1.0) {
                 zoomRatio = 32;
             }
-
-            zoomRatio = Math.round(zoomRatio);
-
             zoomVal.innerText = zoomRatio;
             redraw();
         }
@@ -333,11 +332,13 @@
         }
 
         function setPixelColor(x,y,clr,noUndo) {
-
-            if (!noUndo) {
-                undoStack.push({ x: x, y: y, clr: pixelData[x][y] });
+            // ignore if the pixel is not changing colors.
+            if(pixelData[x][y] != clr) {
+                if (!noUndo) {
+                    undoStack.push({ x: x, y: y, clr: pixelData[x][y] });
+                }
+                pixelData[x][y] = clr;
             }
-            pixelData[x][y] = clr;
         }
 
         function doUndoable() {
@@ -347,17 +348,14 @@
                 setPixelColor(obj.x, obj.y, obj.clr, true);
                 // store current context.color
                 var currentColor = context.fillStyle;
-                context.fillStyle = obj.clr || "#000";
+                context.fillStyle = obj.clr || ( ( ( obj.x - offsetX) % 2 ^ (obj.y - offsetY) % 2) ? "#000" : "#333")
 
                 var pxSz = getPixelSize();
 
                 context.beginPath();
                 context.fillRect(obj.x * pxSz, obj.y * pxSz, pxSz, pxSz);
-                context.strokeRect(obj.x * pxSz, obj.y * pxSz, pxSz, pxSz);
-                context.stroke();
                 context.closePath();
-                // restore current context.color
-                context.fillStyle = currentColor;
+                context.fillStyle = currentColor; // restore currentColor
 
                 if (undoStack.length < 1) {
                        // TODO: disable undo btn
@@ -397,9 +395,9 @@
 
                 context.beginPath();
                 context.fillRect(x * pxSz, y * pxSz, pxSz, pxSz);
-                context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
+                //context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
                 setPixelColor(x, y, context.fillStyle);
-                context.stroke();
+                //context.stroke();
                 context.closePath();
             }
         }
@@ -428,12 +426,12 @@
                 e.preventDefault();
                 if(x != startX || y != startY) {
                     context.fillRect(x * pxSz,y*pxSz,pxSz,pxSz);
-                    context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
+                    //context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
                     setPixelColor(offsetX + x, offsetY + y, context.fillStyle);
                     wasPenDrag = true;
                 }
 
-                context.stroke();
+                //context.stroke();
                 startX = x;
                 startY = y;
 
