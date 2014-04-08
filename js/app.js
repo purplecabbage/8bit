@@ -240,12 +240,8 @@
         }
 
         function doZoom(dir) {
-            if(dir > 0) {
-                zoomRatio *= 1.5;
-            }
-            else {
-                zoomRatio /= 1.5;
-            }
+
+            zoomRatio += dir;
             
             if(zoomRatio > 32) {
                 zoomRatio = 1.0;

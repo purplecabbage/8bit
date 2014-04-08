@@ -50,8 +50,8 @@ body
 
 #zoomBar 
 {
-    border:solid 1px #333;
-    background-color:#310;
+    border:solid 1px #000;
+    background-color:#111;
     width:100%;
     min-width:480px;
     max-width:640px;
@@ -72,7 +72,7 @@ body
     display:inline-block;
     margin:2px auto;
     padding:8px 8px;
-    border:solid 1px Red;
+    border:solid 1px #333;
     font-size: 48pt;
     font-weight: bolder;
     font-family: Arial;
@@ -83,6 +83,7 @@ body
     font-size: 32pt;
     font-family: sans-serif;
     letter-spacing: -0.05em; 
+    border:none;
 }
 
 #toolBar
