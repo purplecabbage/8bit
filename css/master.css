@@ -50,13 +50,14 @@ body
 
 #zoomBar 
 {
+
     border:solid 1px #000;
     background-color:#111;
     width:100%;
     min-width:480px;
     max-width:640px;
     height:60px;
-    display:table;
+    display:none;
     margin:0 auto;
     text-align: center;
 }
@@ -120,6 +121,11 @@ body
 #toolBtnMove
 {
     background-image:url(../assets/48_move.png);
+}
+
+#toolBtnErase
+{
+    background-image:url(../assets/48_erase.png);
 }
 
 #toolBtnUndo 
