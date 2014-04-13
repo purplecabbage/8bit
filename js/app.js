@@ -13,6 +13,9 @@
         var currentColor = "#FFF";
         var selectedTool;
 
+        var selectionColor = "#884466"; // applied to the toolbar items
+        var nonSelectColor = "#000";
+
         var pixelData;
         var defaultPixelSize = 8;
         var zoomRatio = 2.0;
@@ -187,7 +190,7 @@
 
             var btns = document.querySelectorAll("#toolBar div");
             for(var n = 0; n<btns.length; n++) {
-                btns[n].style.backgroundColor = "Black";
+                btns[n].style.backgroundColor = nonSelectColor;
             }
 
             switch(e.target.id) {
@@ -202,12 +205,12 @@
                     if(e.target.active) {
                         e.target.active = false;
                         showColorPicker(false);
-                        e.target.style.backgroundColor = "Black";
+                        e.target.style.backgroundColor = nonSelectColor;
                         return;
                     }
                     else {
                         e.target.active = true;
-                        e.target.style.backgroundColor = "#884466";
+                        e.target.style.backgroundColor = selectionColor;
                         showColorPicker(true);
                     }
                     break;
@@ -230,18 +233,18 @@
                     if(e.target.active) {
                         e.target.active = false;
                         showZoomControls(false);
-                        e.target.style.backgroundColor = "Black";
+                        e.target.style.backgroundColor = nonSelectColor;
                     }
                     else {
                         e.target.active = true;
                         showZoomControls(true);
-                        e.target.style.backgroundColor = "#884466";
+                        e.target.style.backgroundColor = selectionColor;
                     }
                     break;
             }
 
             selectedTool.active = true;
-            selectedTool.style.backgroundColor = "#884466";
+            selectedTool.style.backgroundColor = selectionColor;
         
         }
 
