@@ -386,14 +386,18 @@
             var pxSz = getPixelSize();
             var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
             var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
-            startX = x;
-            startY = y;
+            startX = -1;//x;
+            startY = -1;//y;
+
+            wasPenDrag = false;
 
             if(selectedTool == toolBtnMove) {
                 
             }
             else if(selectedTool == toolBtnErase) {
-
+                e.preventDefault();
+                context.save();
+                context.beginPath();
             }
             else { // default is the pen tool
                 e.preventDefault();
@@ -401,24 +405,35 @@
 
                 context.fillStyle = getCurrentColor();
                 
-                wasPenDrag = false;
                 context.beginPath();
             }
         }
 
         function onToolClick(e) {
             if(!wasPenDrag) { // dragging the pen also fills pixels, so we ignore click events if the 'pen' moved
-
                 var pxSz = getPixelSize();
                 var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
                 var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
 
-                context.beginPath();
-                context.fillRect(x * pxSz, y * pxSz, pxSz, pxSz);
-                //context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
-                setPixelColor(x, y, context.fillStyle);
-                //context.stroke();
-                context.closePath();
+                if(selectedTool == toolBtnErase) {
+
+                    var fillStyle = context.fillStyle;
+                    context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
+                    setPixelColor(x, y, 0);
+                    context.beginPath();
+                    context.fillRect(x * pxSz, y * pxSz, pxSz, pxSz);
+                    //context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
+                    context.closePath();
+                    context.fillStyle = fillStyle;
+                }
+                else {
+                    context.beginPath();
+                    context.fillRect(x * pxSz, y * pxSz, pxSz, pxSz);
+                    //context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
+                    setPixelColor(x, y, context.fillStyle);
+                    //context.stroke();
+                    context.closePath();
+                }
             }
         }
 
@@ -438,6 +453,19 @@
                     offsetY -= y - startY;
                     redraw();
                 }
+                startX = x;
+                startY = y;
+            }
+            else if(selectedTool == toolBtnErase) {
+                e.preventDefault();
+                if(x != startX || y != startY) {
+                    context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
+                    context.fillRect(x * pxSz,y*pxSz,pxSz,pxSz);
+                    setPixelColor(offsetX + x, offsetY + y, 0);
+
+                    wasPenDrag = true;
+                }
+
                 startX = x;
                 startY = y;
             }
