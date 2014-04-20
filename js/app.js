@@ -136,10 +136,6 @@
             context.closePath();
         }
 
-        function drawPixel( ) {
-
-        }
-
         function exportImage() {
 
             var mux = 20;
@@ -404,9 +400,7 @@
             else { // default is the pen tool
                 e.preventDefault();
                 context.save();
-
                 context.fillStyle = getCurrentColor();
-                
                 context.beginPath();
             }
         }
@@ -459,11 +453,9 @@
                     offsetX -= x - startX;
                     offsetY -= y - startY;
                     //redraw();
-                    currentCanvas.style.left = -offsetX + "px";
-                    currentCanvas.style.top = -offsetY + "px";
+                    currentCanvas.style.left = offsetX + "px";
+                    currentCanvas.style.top = offsetY + "px";
                 }
-                startX = x;
-                startY = y;
             }
             else if(selectedTool == toolBtnErase) {
                 e.preventDefault();
@@ -474,9 +466,6 @@
                     }
                     wasPenDrag = true;
                 }
-
-                startX = x;
-                startY = y;
             }
             else {
                 
@@ -486,11 +475,10 @@
                     setPixelColor(offsetX + x, offsetY + y, context.fillStyle);
                     wasPenDrag = true;
                 }
-
-                startX = x;
-                startY = y;
-
             }
+
+            startX = x;
+            startY = y;
         }
 
         function onToolEnd(e) {
