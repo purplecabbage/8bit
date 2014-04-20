@@ -1,6 +1,57 @@
 
 // icons:: https://www.iconfinder.com/search/?q=iconset:jigsoar-icons
 
+var render = (function(global) {
+    
+    var docStyle = document.documentElement.style;
+    
+    var engine;
+    if (global.opera && Object.prototype.toString.call(opera) === '[object Opera]') {
+        engine = 'presto';
+    } else if ('MozAppearance' in docStyle) {
+        engine = 'gecko';
+    } else if ('WebkitAppearance' in docStyle) {
+        engine = 'webkit';
+    } else if (typeof navigator.cpuClass === 'string') {
+        engine = 'trident';
+    }
+    
+    var vendorPrefix = {
+        trident: 'ms',
+        gecko: 'Moz',
+        webkit: 'Webkit',
+        presto: 'O'
+    }[engine];
+    
+    var helperElem = document.createElement("div");
+    var undef;
+
+    var perspectiveProperty = vendorPrefix + "Perspective";
+    var transformProperty = vendorPrefix + "Transform";
+    
+    if (helperElem.style[perspectiveProperty] !== undef) {
+        
+        return function(left, top, zoom) {
+            content.style[transformProperty] = 'translate3d(' + (-left) + 'px,' + (-top) + 'px,0) scale(' + zoom + ')';
+        };  
+        
+    } else if (helperElem.style[transformProperty] !== undef) {
+        
+        return function(left, top, zoom) {
+            content.style[transformProperty] = 'translate(' + (-left) + 'px,' + (-top) + 'px) scale(' + zoom + ')';
+        };
+        
+    } else {
+        
+        return function(left, top, zoom) {
+            content.style.marginLeft = left ? (-left/zoom) + 'px' : '';
+            content.style.marginTop = top ? (-top/zoom) + 'px' : '';
+            content.style.zoom = zoom || '';
+        };
+        
+    }
+})(this);
+
 
 (function(exports){
 
@@ -29,6 +80,8 @@
         var offsetY = 0;
 
         var undoStack = [];
+
+        var scrollerObj;
 
         exports.init = function () {
             
@@ -72,17 +125,34 @@
 
         function initCanvas() {
 
-            currentCanvas = drawCanvas
+            currentCanvas = content;
             context = currentCanvas.getContext('2d');
             context.width = canvasWidth;
             context.height = canvasHeight;
             
             clearCanvas();
 
-            canvasHolder.addEventListener("pointerdown",onToolStart);
-            canvasHolder.addEventListener("pointermove", onToolMove);
+            container.addEventListener("pointerdown",onToolStart);
+            container.addEventListener("pointermove", onToolMove);
             document.addEventListener("pointerup",  onToolEnd);
-            canvasHolder.addEventListener("click",  onToolClick);
+            container.addEventListener("click",  onToolClick);
+
+            scrollerObj = new Scroller(function(left, top, zoom) {
+                // apply coordinates/zooming
+                console.log(left + " : " + top + " : " + zoom);
+                render(left,top,zoom);
+            }, 
+            {
+                zooming :true,
+                maxZoom:8,
+                minZoom:-8
+            });
+
+            
+            //var rect = container.getBoundingClientRect();
+
+            //scrollerObj.setPosition(rect.left+container.clientLeft, rect.top+container.clientTop);
+            
         }
 
         function clearCanvas() {
@@ -268,7 +338,9 @@
             }
             zoomVal.innerText = zoomRatio;
             //redraw();
-            drawCanvas.style.webkitTransform = "scale(" + zoomRatio +  ")";
+            //content.style.webkitTransform = "scale(" + zoomRatio +  ")";
+
+            scrollerObj.zoomTo(zoomRatio);
         }
 
         function getCurrentColor() {
@@ -390,7 +462,10 @@
             wasPenDrag = false;
 
             if(selectedTool == toolBtnMove) {
-                
+                scrollerObj.doTouchStart([{
+                    pageX: e.pageX,
+                    pageY: e.pageY
+                }], e.timeStamp);
             }
             else if(selectedTool == toolBtnErase) {
                 e.preventDefault();
@@ -425,7 +500,7 @@
                     context.fillStyle = fillStyle;
                 }
                 else if(selectedTool == toolBtnMove) {
-
+                    // click should do nothing for move tool
                 }
                 else {
                     context.beginPath();
@@ -449,13 +524,10 @@
             var y = Math.floor( e.offsetY / pxSz );
 
             if(selectedTool == toolBtnMove) {
-                if(x != startX || y != startY) {
-                    offsetX -= x - startX;
-                    offsetY -= y - startY;
-                    //redraw();
-                    currentCanvas.style.left = offsetX + "px";
-                    currentCanvas.style.top = offsetY + "px";
-                }
+                scrollerObj.doTouchMove([{
+                    pageX: e.pageX,
+                    pageY: e.pageY
+                }], e.timeStamp);
             }
             else if(selectedTool == toolBtnErase) {
                 e.preventDefault();
@@ -487,7 +559,7 @@
             startY = -1;
 
             if(selectedTool == toolBtnMove) {
-
+                scrollerObj.doTouchEnd(e.timeStamp);
             }
             else {
                 e.preventDefault();
