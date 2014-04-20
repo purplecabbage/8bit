@@ -18,11 +18,12 @@
 
         var pixelData;
         var defaultPixelSize = 8;
-        var zoomRatio = 2.0;
+        var zoomRatio = 1.0;
         var canvasWidth = 120; // in pixels
         var canvasHeight = 160; // in pixels
 
-
+        var maxZoom = 8;
+        var minZoom = 1;
 
         var offsetX = 0;
         var offsetY = 0;
@@ -66,7 +67,7 @@
         }
 
         function getPixelSize() {
-            return defaultPixelSize * zoomRatio;
+            return defaultPixelSize;// * zoomRatio;
         }
 
         function initCanvas() {
@@ -80,7 +81,7 @@
 
             canvasHolder.addEventListener("pointerdown",onToolStart);
             canvasHolder.addEventListener("pointermove", onToolMove);
-            canvasHolder.addEventListener("pointerup",  onToolEnd);
+            document.addEventListener("pointerup",  onToolEnd);
             canvasHolder.addEventListener("click",  onToolClick);
         }
 
@@ -263,14 +264,15 @@
 
             zoomRatio += dir;
             
-            if(zoomRatio > 32) {
-                zoomRatio = 1.0;
+            if(zoomRatio > maxZoom) {
+                zoomRatio = minZoom;
             }
-            else if(zoomRatio < 1.0) {
-                zoomRatio = 32;
+            else if(zoomRatio < minZoom) {
+                zoomRatio = maxZoom;
             }
             zoomVal.innerText = zoomRatio;
-            redraw();
+            //redraw();
+            drawCanvas.style.webkitTransform = "scale(" + zoomRatio +  ")";
         }
 
         function getCurrentColor() {
@@ -343,11 +345,7 @@
             }
         }
 
-        function updateDebugText(x,y)
-        {
-            //toolBar.innerText = startX + "," + startY + "," + x + "," + y;
-        }
-
+        //returns true if the color value has changed
         function setPixelColor(x,y,clr,noUndo) {
             // ignore if the pixel is not changing colors.
             if(pixelData[x][y] != clr) {
@@ -355,7 +353,9 @@
                     undoStack.push({ x: x, y: y, clr: pixelData[x][y] });
                 }
                 pixelData[x][y] = clr;
+                return true;
             }
+            return false;
         }
 
         function doUndoable() {
@@ -384,8 +384,10 @@
         function onToolStart(e) {
             toolActive = true;
             var pxSz = getPixelSize();
-            var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
-            var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
+
+            var x = Math.floor( e.offsetX / pxSz );
+            var y = Math.floor( e.offsetY / pxSz );
+
             startX = -1;//x;
             startY = -1;//y;
 
@@ -410,10 +412,12 @@
         }
 
         function onToolClick(e) {
+
             if(!wasPenDrag) { // dragging the pen also fills pixels, so we ignore click events if the 'pen' moved
                 var pxSz = getPixelSize();
-                var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
-                var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
+
+                var x = Math.floor( e.offsetX / pxSz );
+                var y = Math.floor( e.offsetY / pxSz );
 
                 if(selectedTool == toolBtnErase) {
 
@@ -425,6 +429,9 @@
                     //context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
                     context.closePath();
                     context.fillStyle = fillStyle;
+                }
+                else if(selectedTool == toolBtnMove) {
+
                 }
                 else {
                     context.beginPath();
@@ -444,14 +451,16 @@
             }
 
             var pxSz = getPixelSize();
-            var x = Math.floor(( e.pageX - currentCanvas.offsetLeft ) / pxSz );
-            var y = Math.floor(( e.pageY - currentCanvas.offsetTop ) / pxSz );
+            var x = Math.floor( e.offsetX / pxSz );
+            var y = Math.floor( e.offsetY / pxSz );
 
             if(selectedTool == toolBtnMove) {
                 if(x != startX || y != startY) {
                     offsetX -= x - startX;
                     offsetY -= y - startY;
-                    redraw();
+                    //redraw();
+                    currentCanvas.style.left = -offsetX + "px";
+                    currentCanvas.style.top = -offsetY + "px";
                 }
                 startX = x;
                 startY = y;
@@ -459,10 +468,10 @@
             else if(selectedTool == toolBtnErase) {
                 e.preventDefault();
                 if(x != startX || y != startY) {
-                    context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
-                    context.fillRect(x * pxSz,y*pxSz,pxSz,pxSz);
-                    setPixelColor(offsetX + x, offsetY + y, 0);
-
+                    if(setPixelColor(offsetX + x, offsetY + y, 0)) {
+                        context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
+                        context.fillRect(x * pxSz,y*pxSz,pxSz,pxSz);
+                    }
                     wasPenDrag = true;
                 }
 

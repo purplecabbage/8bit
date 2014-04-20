@@ -169,9 +169,13 @@ body
 	margin:0 auto;
 	padding:0 0;
     width:480px;
+    height:480px;
+    overflow:hidden;
 }
 
 canvas
 {
     margin:0 auto;
+    -webkit-transform-origin: 0 0;
+    position:relative;
 }
