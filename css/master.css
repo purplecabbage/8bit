@@ -165,7 +165,7 @@ body
 
 #container
 {
-	background-color:#111;
+	background-color:Blue;
 	margin:0 auto;
 	padding:0 0;
     width:480px;
@@ -176,6 +176,6 @@ body
 #content
 {
     margin:0 auto;
-    /*-webkit-transform-origin: 0 0;*/
+    -webkit-transform-origin: 0 0;
     position:relative;
 }

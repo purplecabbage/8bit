@@ -127,13 +127,13 @@ var render = (function(global) {
 
             currentCanvas = content;
             context = currentCanvas.getContext('2d');
-            context.width = canvasWidth;
-            context.height = canvasHeight;
+            context.width = 480;//canvasWidth;
+            context.height = 640;//canvasHeight;
             
             clearCanvas();
 
             container.addEventListener("pointerdown",onToolStart);
-            container.addEventListener("pointermove", onToolMove);
+            container.addEventListener("pointermove",onToolMove);
             document.addEventListener("pointerup",  onToolEnd);
             container.addEventListener("click",  onToolClick);
 
@@ -145,13 +145,10 @@ var render = (function(global) {
             {
                 zooming :true,
                 maxZoom:8,
-                minZoom:-8
+                minZoom:0.25
             });
 
-            
-            //var rect = container.getBoundingClientRect();
-
-            //scrollerObj.setPosition(rect.left+container.clientLeft, rect.top+container.clientTop);
+            scrollerObj.setDimensions(480,640,480,640);
             
         }
 
@@ -171,7 +168,8 @@ var render = (function(global) {
             offsetX = Math.max(offsetX,0);
             offsetY = Math.max(offsetY,0);
 
-            context.clearRect(0,0,canvasWidth,canvasHeight);
+            context.clearRect(0,0,480,640);//canvasWidth,canvasHeight);
+
             context.fillStyle = "#000";
             //context.strokeStyle = "#333";
             context.beginPath();
@@ -339,8 +337,9 @@ var render = (function(global) {
             zoomVal.innerText = zoomRatio;
             //redraw();
             //content.style.webkitTransform = "scale(" + zoomRatio +  ")";
+            scrollerObj.zoomTo(zoomRatio,true,0,0);
+            
 
-            scrollerObj.zoomTo(zoomRatio);
         }
 
         function getCurrentColor() {
@@ -514,8 +513,12 @@ var render = (function(global) {
         }
 
         function onToolMove(e) {
+
+            console.log("onToolMove");
+
             // need tool active for mouse-move support
             if(!toolActive) {
+
                 return;
             }
 
@@ -554,6 +557,7 @@ var render = (function(global) {
         }
 
         function onToolEnd(e) {
+            console.log("onToolEnd");
             toolActive = false; 
             startX = -1;
             startY = -1;
