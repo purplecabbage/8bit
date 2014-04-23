@@ -20,7 +20,7 @@ body
 
 #screen
 {
-    background-color:#111;
+    background-color:#113;
 }
 
 #clrPicker
@@ -169,7 +169,7 @@ body
 	margin:0 auto;
 	padding:0 0;
     width:480px;
-    height:480px;
+    height:580px;
     overflow:hidden;
 }
 
