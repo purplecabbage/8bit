@@ -18,10 +18,10 @@
         var nonSelectColor = "#000";
 
         var pixelData;
-        var defaultPixelSize = 8;
-        var zoomRatio = 1.0;
-        var canvasWidth = 120; // in pixels
-        var canvasHeight = 160; // in pixels
+        var defaultPixelSize = 16;
+        var zoomRatio = 2.0;
+        var canvasWidth = 60; // in pixels
+        var canvasHeight = 72; // in pixels
 
         var maxZoom = 8;
         var minZoom = 1;
@@ -40,6 +40,11 @@
 
             window.addEventListener("resize",debounce(onResize,200));
 
+            setTimeout(function(){
+                splash.style.display = "none";
+
+            },1000);
+
         }
 
         function onResize(){
@@ -52,6 +57,7 @@
 
             var btns = document.querySelectorAll("#toolBar div");
             for(var n = 0; n<btns.length; n++) {
+                console.log("adding click handler for " + n);
                 btns[n].addEventListener('click',onToolBtn);
             }
             
@@ -78,14 +84,14 @@
             currentCanvas = content;
             context = currentCanvas.getContext('2d');
             context.width = 480;//canvasWidth;
-            context.height = 640;//canvasHeight;
+            context.height = 580;//canvasHeight;
             
             clearCanvas();
 
             container.addEventListener("pointerdown",onToolStart);
             container.addEventListener("pointermove",onToolMove);
-            document.addEventListener("pointerup",  onToolEnd);
-            container.addEventListener("click",  onToolClick);
+            container.addEventListener("pointerup",  onToolEnd);
+            currentCanvas.addEventListener("click", onToolClick);
 
             scrollerObj = new Scroller(function(left, top, zoom) {
                 // apply coordinates/zooming
@@ -98,7 +104,7 @@
                 minZoom:0.25
             });
 
-            scrollerObj.setDimensions(480,640,480,640);
+            scrollerObj.setDimensions(480,580,480,580);
             
         }
 
@@ -118,7 +124,7 @@
             offsetX = Math.max(offsetX,0);
             offsetY = Math.max(offsetY,0);
 
-            context.clearRect(0,0,480,640);//canvasWidth,canvasHeight);
+            context.clearRect(0,0,480,580);//canvasWidth,canvasHeight);
 
             context.fillStyle = "#000";
             //context.strokeStyle = "#333";
@@ -430,6 +436,8 @@
         }
 
         function onToolClick(e) {
+
+            console.log("onToolClick");
 
             if(!wasPenDrag) { // dragging the pen also fills pixels, so we ignore click events if the 'pen' moved
                 var pxSz = getPixelSize();

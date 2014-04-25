@@ -1,4 +1,8 @@
 
+window.onerror = function (err, fn, ln) {
+    console.log("error : " + err + ", " + fn + " : " + ln);
+};
+
 
  function debounce(func, delay, immediate) {
     var timeout;
