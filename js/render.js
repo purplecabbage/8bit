@@ -1,3 +1,4 @@
+// This is direct from the zynga scroller example
 
 var render = (function(global) {
     

@@ -18,7 +18,7 @@
         var nonSelectColor = "#000";
 
         var pixelData;
-        var defaultPixelSize = 16;
+        var pixelSize = 16;
         var zoomRatio = 2.0;
         var canvasWidth = 60; // in pixels
         var canvasHeight = 72; // in pixels
@@ -75,10 +75,6 @@
             zoomVal.innerText = zoomRatio;
         }
 
-        function getPixelSize() {
-            return defaultPixelSize;// * zoomRatio;
-        }
-
         function initCanvas() {
 
             currentCanvas = content;
@@ -130,9 +126,8 @@
             //context.strokeStyle = "#333";
             context.beginPath();
 
-            var pxSz = getPixelSize();
-            var pX = Math.ceil(canvasWidth / pxSz);
-            var pY = Math.ceil(canvasHeight / pxSz);
+            var pX = Math.ceil(canvasWidth / pixelSize);
+            var pY = Math.ceil(canvasHeight / pixelSize);
 
             console.log("pX = " + pX);
 
@@ -152,8 +147,8 @@
                         context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
                     }
                     
-                    context.fillRect(adjX * pxSz, adjY * pxSz, pxSz, pxSz);
-                    //context.strokeRect(adjX * pxSz, adjY * pxSz, pxSz, pxSz);
+                    context.fillRect(adjX * pixelSize, adjY * pixelSize, pixelSize, pixelSize);
+                    //context.strokeRect(adjX * pixelSize, adjY * pixelSize, pixelSize, pixelSize);
                 }
             }
             //context.stroke();
@@ -390,10 +385,8 @@
                 var currentColor = context.fillStyle;
                 context.fillStyle = obj.clr || ( ( ( obj.x - offsetX) % 2 ^ (obj.y - offsetY) % 2) ? "#000" : "#333")
 
-                var pxSz = getPixelSize();
-
                 context.beginPath();
-                context.fillRect(obj.x * pxSz, obj.y * pxSz, pxSz, pxSz);
+                context.fillRect(obj.x * pixelSize, obj.y * pixelSize, pixelSize, pixelSize);
                 context.closePath();
                 context.fillStyle = currentColor; // restore currentColor
 
@@ -406,10 +399,9 @@
 
         function onToolStart(e) {
             toolActive = true;
-            var pxSz = getPixelSize();
 
-            var x = Math.floor( e.offsetX / pxSz );
-            var y = Math.floor( e.offsetY / pxSz );
+            var x = Math.floor( e.offsetX / pixelSize );
+            var y = Math.floor( e.offsetY / pixelSize );
 
             startX = -1;//x;
             startY = -1;//y;
@@ -440,10 +432,9 @@
             console.log("onToolClick");
 
             if(!wasPenDrag) { // dragging the pen also fills pixels, so we ignore click events if the 'pen' moved
-                var pxSz = getPixelSize();
 
-                var x = Math.floor( e.offsetX / pxSz );
-                var y = Math.floor( e.offsetY / pxSz );
+                var x = Math.floor( e.offsetX / pixelSize );
+                var y = Math.floor( e.offsetY / pixelSize );
 
                 if(selectedTool == toolBtnErase) {
 
@@ -451,8 +442,8 @@
                     context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
                     setPixelColor(x, y, 0);
                     context.beginPath();
-                    context.fillRect(x * pxSz, y * pxSz, pxSz, pxSz);
-                    //context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
+                    context.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                    //context.strokeRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
                     context.closePath();
                     context.fillStyle = fillStyle;
                 }
@@ -461,8 +452,8 @@
                 }
                 else {
                     context.beginPath();
-                    context.fillRect(x * pxSz, y * pxSz, pxSz, pxSz);
-                    //context.strokeRect(x * pxSz, y * pxSz, pxSz, pxSz);
+                    context.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                    //context.strokeRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
                     setPixelColor(x, y, context.fillStyle);
                     //context.stroke();
                     context.closePath();
@@ -480,9 +471,8 @@
                 return;
             }
 
-            var pxSz = getPixelSize();
-            var x = Math.floor( e.offsetX / pxSz );
-            var y = Math.floor( e.offsetY / pxSz );
+            var x = Math.floor( e.offsetX / pixelSize );
+            var y = Math.floor( e.offsetY / pixelSize );
 
             if(selectedTool == toolBtnMove) {
                 scrollerObj.doTouchMove([{
@@ -495,7 +485,7 @@
                 if(x != startX || y != startY) {
                     if(setPixelColor(offsetX + x, offsetY + y, 0)) {
                         context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
-                        context.fillRect(x * pxSz,y*pxSz,pxSz,pxSz);
+                        context.fillRect(x * pixelSize,y*pixelSize,pixelSize,pixelSize);
                     }
                     wasPenDrag = true;
                 }
@@ -504,7 +494,7 @@
                 
                 e.preventDefault();
                 if(x != startX || y != startY) {
-                    context.fillRect(x * pxSz,y*pxSz,pxSz,pxSz);
+                    context.fillRect(x * pixelSize,y*pixelSize,pixelSize,pixelSize);
                     setPixelColor(offsetX + x, offsetY + y, context.fillStyle);
                     wasPenDrag = true;
                 }
