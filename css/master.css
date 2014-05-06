@@ -63,15 +63,15 @@ body
 #zoomBar 
 {
 
-    border:solid 1px #000;
-    background-color:#111;
-    width:100%;
-    min-width:480px;
-    max-width:640px;
+   width:100%;
     height:60px;
     display:none;
     margin:0 auto;
     text-align: center;
+    position:absolute;
+    top:62px;
+    text-align:center;
+    z-index:12;
 }
 
 #zoomBar > div
@@ -89,6 +89,7 @@ body
     font-size: 48pt;
     font-weight: bolder;
     font-family: Arial;
+    background-color: #111;
 }
 
 #zoomVal 
