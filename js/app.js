@@ -19,7 +19,7 @@
 
         var pixelData;
         var pixelSize = 16;
-        var zoomRatio = 2.0;
+        var zoomRatio = 1.0;
         var canvasWidth = 60; // in pixels
         var canvasHeight = 72; // in pixels
 
@@ -84,14 +84,14 @@
             
             clearCanvas();
 
-            container.addEventListener("pointerdown",onToolStart);
-            container.addEventListener("pointermove",onToolMove);
-            container.addEventListener("pointerup",  onToolEnd);
+            container.addEventListener("mousedown",onToolStart);
+            container.addEventListener("mousemove",onToolMove);
+            container.addEventListener("mouseup",  onToolEnd);
             currentCanvas.addEventListener("click", onToolClick);
 
             scrollerObj = new Scroller(function(left, top, zoom) {
                 // apply coordinates/zooming
-                console.log(left + " : " + top + " : " + zoom);
+                //console.log(left + " : " + top + " : " + zoom);
                 render(left,top,zoom);
             }, 
             {
@@ -157,23 +157,23 @@
 
         function exportImage() {
 
-            var mux = 20;
+            var mux = 1;
 
             var tempCanvas = document.createElement("canvas");
             tempCanvas.width = pixelData.length * mux;
             tempCanvas.height = pixelData[0].length * mux;
 
 // Not required to export data, but a HUD might be nice ...
-/*
+
             tempCanvas.style.position = "absolute";
             tempCanvas.style.right = "0px";
-            tempCanvas.style.top = "0px";
+            tempCanvas.style.bottom = "0px";
             document.body.appendChild(tempCanvas);
-*/
+
             var ctx = tempCanvas.getContext('2d');
 
             // if we want a background color, it should go here ...
-            //ctx.clearRect(0, 0, pixelData.length * mux, pixelData[0].length * mux);
+            ctx.clearRect(0, 0, pixelData.length * mux, pixelData[0].length * mux);
 
             ctx.lineCap = "square";
             ctx.lineJoin = "miter";
@@ -190,11 +190,11 @@
 
             ctx.closePath();
             
-            var imgData = tempCanvas.toDataURL("image/png", "");
+            var imgData = tempCanvas.toDataURL("image/png", 1.0);
 
             // are we in a cordova app with a saveImageToCameraRoll method?
             try {
-                window.device.saveImageDataToCameraRoll(null,null,tempCanvas.toDataURL());
+                window.device.saveImageDataToCameraRoll(null, null, imgData);
             }
             catch(e) {
                 window.open(imgData);
@@ -289,8 +289,6 @@
             //redraw();
             //content.style.webkitTransform = "scale(" + zoomRatio +  ")";
             scrollerObj.zoomTo(zoomRatio,true,0,0);
-            
-
         }
 
         function getCurrentColor() {
@@ -376,25 +374,30 @@
             return false;
         }
 
+        function drawPixel(x,y,clr,noUndo) {
+            var fillStyle = context.fillStyle;
+            if(!clr) {
+                context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
+            }
+            else {
+                context.fillStyle = clr;
+            }
+            if(setPixelColor(x, y, clr,noUndo)) {
+                context.beginPath();
+                context.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
+                context.closePath();
+                context.fillStyle = fillStyle;
+            }
+        }
+
         function doUndoable() {
             var obj = undoStack.pop();
             if (obj) {
-
-                setPixelColor(obj.x, obj.y, obj.clr, true);
-                // store current context.color
-                var currentColor = context.fillStyle;
-                context.fillStyle = obj.clr || ( ( ( obj.x - offsetX) % 2 ^ (obj.y - offsetY) % 2) ? "#000" : "#333")
-
-                context.beginPath();
-                context.fillRect(obj.x * pixelSize, obj.y * pixelSize, pixelSize, pixelSize);
-                context.closePath();
-                context.fillStyle = currentColor; // restore currentColor
-
+                drawPixel(obj.x, obj.y, obj.clr, true);
                 if (undoStack.length < 1) {
                        // TODO: disable undo btn
                 }
             }
-
         }
 
         function onToolStart(e) {
@@ -437,37 +440,21 @@
                 var y = Math.floor( e.offsetY / pixelSize );
 
                 if(selectedTool == toolBtnErase) {
-
-                    var fillStyle = context.fillStyle;
-                    context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
-                    setPixelColor(x, y, 0);
-                    context.beginPath();
-                    context.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-                    //context.strokeRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-                    context.closePath();
-                    context.fillStyle = fillStyle;
+                    drawPixel(x,y,0);
                 }
                 else if(selectedTool == toolBtnMove) {
                     // click should do nothing for move tool
                 }
                 else {
-                    context.beginPath();
-                    context.fillRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-                    //context.strokeRect(x * pixelSize, y * pixelSize, pixelSize, pixelSize);
-                    setPixelColor(x, y, context.fillStyle);
-                    //context.stroke();
-                    context.closePath();
+                    drawPixel(x,y,context.fillStyle);
                 }
             }
         }
 
         function onToolMove(e) {
 
-            console.log("onToolMove");
-
             // need tool active for mouse-move support
             if(!toolActive) {
-
                 return;
             }
 
@@ -483,10 +470,7 @@
             else if(selectedTool == toolBtnErase) {
                 e.preventDefault();
                 if(x != startX || y != startY) {
-                    if(setPixelColor(offsetX + x, offsetY + y, 0)) {
-                        context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
-                        context.fillRect(x * pixelSize,y*pixelSize,pixelSize,pixelSize);
-                    }
+                    drawPixel(x,y,0);
                     wasPenDrag = true;
                 }
             }
@@ -494,8 +478,7 @@
                 
                 e.preventDefault();
                 if(x != startX || y != startY) {
-                    context.fillRect(x * pixelSize,y*pixelSize,pixelSize,pixelSize);
-                    setPixelColor(offsetX + x, offsetY + y, context.fillStyle);
+                    drawPixel(x,y,context.fillStyle);
                     wasPenDrag = true;
                 }
             }
