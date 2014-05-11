@@ -84,9 +84,7 @@
             
             clearCanvas();
 
-            container.addEventListener("mousedown",onToolStart);
-            container.addEventListener("mousemove",onToolMove);
-            container.addEventListener("mouseup",  onToolEnd);
+            container.addEventListener(digits.start,onToolStart);
             currentCanvas.addEventListener("click", onToolClick);
 
             scrollerObj = new Scroller(function(left, top, zoom) {
@@ -401,6 +399,10 @@
         }
 
         function onToolStart(e) {
+
+            container.addEventListener(digits.move,onToolMove);
+            window.addEventListener(digits.end,  onToolEnd);
+
             toolActive = true;
 
             var x = Math.floor( e.offsetX / pixelSize );
@@ -489,6 +491,9 @@
 
         function onToolEnd(e) {
             console.log("onToolEnd");
+            container.removeEventListener(digits.move,onToolMove);
+            window.removeEventListener(digits.end,  onToolEnd);
+
             toolActive = false; 
             startX = -1;
             startY = -1;
