@@ -153,7 +153,62 @@
             context.closePath();
         }
 
+        function exportImage2() {
+
+            var w = pixelData.length;
+            var h = pixelData[0].length;
+            var arr = [];//new Uint8ClampedArray(w*h*4);
+
+            for(var y = 0; y < h; y++) {
+                for(var x = 0; x < w; x++) {
+                    var clr = pixelData[x][y];
+                    var pixel = [0,0,0,255];
+
+                    var loc = 4 * (y * w + x);
+                    if(clr != 0) {
+                        pixel[0] = parseInt("0x" + clr.substr(1,2));
+                        pixel[1] = parseInt("0x" + clr.substr(3,2));
+                        pixel[2] = parseInt("0x" + clr.substr(5,2));
+                    }
+                    arr[loc] = pixel[0];
+                    arr[loc + 1] = pixel[1];
+                    arr[loc + 2] = pixel[2];
+                    arr[loc + 3] = pixel[3];
+                    arr[loc + 3] = 255;
+                }
+            }
+
+            var tempCanvas = document.createElement("canvas");
+
+            tempCanvas.style.position = "absolute";
+            tempCanvas.style.right = "20px";
+            tempCanvas.style.bottom = "20px";
+            tempCanvas.style.border = "solid 1px Red";
+            document.body.appendChild(tempCanvas);
+
+            tempCanvas.width = w / 2;
+            tempCanvas.height = h / 2;
+
+            var ctx = tempCanvas.getContext('2d');
+            var imageData = ctx.createImageData(w,h);
+            imageData.data.set(arr);
+
+            ctx.putImageData(imageData,0,0);
+
+            var imgData = tempCanvas.toDataURL("image/png", 1.0);
+
+            // are we in a cordova app with a saveImageToCameraRoll method?
+            try {
+                window.device.saveImageDataToCameraRoll(null, null, imgData);
+            }
+            catch(e) {
+                window.open(imgData);
+            }
+        }
+
         function exportImage() {
+
+            return exportImage2();
 
             var mux = 1;
 
