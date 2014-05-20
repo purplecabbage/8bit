@@ -64,13 +64,13 @@
             onToolBtn({target:btns[0]});
             clrPicker.onclick = onColorPicker;
 
-            divZoomOut.addEventListener("mouseup",function(e){
+            divZoomOut.addEventListener(digits.end,function(e){
                 e.preventDefault();
                 e.cancelBubble = true;
                 doZoom(-1);
             });
 
-            divZoomIn.addEventListener("mouseup",function(e){
+            divZoomIn.addEventListener(digits.end,function(e){
                 e.preventDefault();
                 e.cancelBubble = true;
                 doZoom(1);
@@ -324,11 +324,11 @@
 
         function showZoomControls(bShow) {
             if(bShow) {
-                document.body.addEventListener("mouseup",removeSelection);
+                document.body.addEventListener(digits.end,removeSelection);
                 zoomBar.style.display = "table";
             }
             else {
-                document.body.removeEventListener("mouseup",removeSelection);
+                document.body.removeEventListener(digits.end,removeSelection);
                 zoomBar.style.display = "none";
             }
         }
