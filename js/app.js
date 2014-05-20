@@ -109,6 +109,9 @@
 
         function clearCanvas() {
             pixelData = [];
+            undoStack = [];
+            undoSets = [];
+
             for(var i = 0; i < canvasWidth; i++) {
                     pixelData[i] = [];
                 for(var j = 0; j < canvasHeight; j++) {
@@ -349,7 +352,6 @@
             });
 
             colors.sort();
-            console.log("colors.length = " + colors.length);
                 
             for(var n = 0; n < colors.length; n++) {
                 var elem = document.createElement("div");
