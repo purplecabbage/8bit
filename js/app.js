@@ -64,11 +64,15 @@
             onToolBtn({target:btns[0]});
             clrPicker.onclick = onColorPicker;
 
-            divZoomOut.addEventListener("click",function(){
+            divZoomOut.addEventListener("mouseup",function(e){
+                e.preventDefault();
+                e.cancelBubble = true;
                 doZoom(-1);
             });
 
-            divZoomIn.addEventListener("click",function(){
+            divZoomIn.addEventListener("mouseup",function(e){
+                e.preventDefault();
+                e.cancelBubble = true;
                 doZoom(1);
             });
 
@@ -317,13 +321,14 @@
         
         }
 
+
         function showZoomControls(bShow) {
             if(bShow) {
-                //document.body.addEventListener("mouseup",removeSelection);
+                document.body.addEventListener("mouseup",removeSelection);
                 zoomBar.style.display = "table";
             }
             else {
-                //document.body.removeEventListener("mouseup",removeSelection);
+                document.body.removeEventListener("mouseup",removeSelection);
                 zoomBar.style.display = "none";
             }
         }
@@ -339,8 +344,7 @@
                 zoomRatio = maxZoom;
             }
             zoomVal.innerText = zoomRatio;
-            //redraw();
-            //content.style.webkitTransform = "scale(" + zoomRatio +  ")";
+
             scrollerObj.zoomTo(zoomRatio,true,0,0);
         }
 
@@ -363,9 +367,12 @@
         }
 
         function removeSelection() {
+
             toolBtnColor.style.backgroundColor = "#000";
             setTimeout(function(){
+                toolBtnColor.active = false;
                 showColorPicker(false);
+                toolBtnZoom.active = false;
                 showZoomControls(false);
             },10);
         }
@@ -455,6 +462,9 @@
 
         function onToolStart(e) {
 
+            if(toolBtnColor.active || toolBtnZoom.active) {
+                return;
+            }
             container.addEventListener(digits.move,onToolMove);
             window.addEventListener(digits.end,  onToolEnd);
 
