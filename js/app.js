@@ -157,11 +157,11 @@
             context.closePath();
         }
 
-        function exportImage2() {
+        function exportImage() {
 
             var w = pixelData.length;
             var h = pixelData[0].length;
-            var arr = [];//new Uint8ClampedArray(w*h*4);
+            var arr = [];
 
             for(var y = 0; y < h; y++) {
                 for(var x = 0; x < w; x++) {
@@ -169,7 +169,7 @@
                     var pixel = [0,0,0,255];
 
                     var loc = 4 * (y * w + x);
-                    if(clr != 0) {
+                    if(clr) {
                         pixel[0] = parseInt("0x" + clr.substr(1,2));
                         pixel[1] = parseInt("0x" + clr.substr(3,2));
                         pixel[2] = parseInt("0x" + clr.substr(5,2));
@@ -178,18 +178,18 @@
                     arr[loc + 1] = pixel[1];
                     arr[loc + 2] = pixel[2];
                     arr[loc + 3] = pixel[3];
-                    arr[loc + 3] = 255;
                 }
             }
 
             var tempCanvas = document.createElement("canvas");
-
-            tempCanvas.style.position = "absolute";
-            tempCanvas.style.right = "20px";
-            tempCanvas.style.bottom = "20px";
-            tempCanvas.style.border = "solid 1px Red";
+            var tSty = tempCanvas.style;
+            tSty.position = "absolute";
+            tSty.right = "20px";
+            tSty.bottom = "20px";
+            tSty.border = "solid 1px Red";
             document.body.appendChild(tempCanvas);
 
+            // not sure why the canvas has to be halved, but the image comes out all mucked otherwise.
             tempCanvas.width = w / 2;
             tempCanvas.height = h / 2;
 
@@ -199,54 +199,6 @@
 
             ctx.putImageData(imageData,0,0);
 
-            var imgData = tempCanvas.toDataURL("image/png", 1.0);
-
-            // are we in a cordova app with a saveImageToCameraRoll method?
-            try {
-                window.device.saveImageDataToCameraRoll(null, null, imgData);
-            }
-            catch(e) {
-                window.open(imgData);
-            }
-        }
-
-        function exportImage() {
-
-            return exportImage2();
-
-            var mux = 1;
-
-            var tempCanvas = document.createElement("canvas");
-            tempCanvas.width = pixelData.length * mux;
-            tempCanvas.height = pixelData[0].length * mux;
-
-// Not required to export data, but a HUD might be nice ...
-
-            tempCanvas.style.position = "absolute";
-            tempCanvas.style.right = "0px";
-            tempCanvas.style.bottom = "0px";
-            document.body.appendChild(tempCanvas);
-
-            var ctx = tempCanvas.getContext('2d');
-
-            // if we want a background color, it should go here ...
-            ctx.clearRect(0, 0, pixelData.length * mux, pixelData[0].length * mux);
-
-            ctx.lineCap = "square";
-            ctx.lineJoin = "miter";
-            ctx.beginPath();
-            for (var x = 0; x < pixelData.length; x++) {
-                for (var y = 0; y < pixelData[x].length; y++) {
-                    
-                    if (pixelData[x][y] != 0) {
-                        ctx.fillStyle = pixelData[x][y];
-                        ctx.fillRect(x * mux, y * mux, mux, mux);
-                    }
-                }
-            }
-
-            ctx.closePath();
-            
             var imgData = tempCanvas.toDataURL("image/png", 1.0);
 
             // are we in a cordova app with a saveImageToCameraRoll method?
