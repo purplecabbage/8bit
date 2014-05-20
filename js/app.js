@@ -30,6 +30,7 @@
         var offsetY = 0;
 
         var undoStack = [];
+        var undoSets = [];
 
         var scrollerObj;
 
@@ -224,7 +225,7 @@
                     break;
                 case "toolBtnUndo" : 
                     // undo tool should not affect the active tool, it is an action
-                    doUndoable();
+                    undoSet();
                     break;
                 case "toolBtnColor" : 
                     if(e.target.active) {
@@ -402,6 +403,16 @@
             }
         }
 
+        function undoSet() {
+            if(undoSets.length) {
+                var undoIndex = undoSets.pop();
+                var diff = undoStack.length - undoIndex;
+                for(var n = 0; n < diff; n++ ) {
+                    doUndoable();
+                }
+            }
+        }
+
         function doUndoable() {
             var obj = undoStack.pop();
             if (obj) {
@@ -417,6 +428,9 @@
             if(toolBtnColor.active || toolBtnZoom.active) {
                 return;
             }
+
+            undoSets.push(undoStack.length);
+
             container.addEventListener(digits.move,onToolMove);
             window.addEventListener(digits.end,  onToolEnd);
 
