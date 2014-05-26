@@ -49,7 +49,11 @@
         }
 
         function onResize(){
-            
+            var className = (window.innerWidth > window.innerHeight) ?
+                            "landscape" : "portrait"; 
+            if(toolBar.className != className) {
+                toolBar.className = className;
+            }
         }
 
         function initAppBar() {
