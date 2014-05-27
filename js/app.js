@@ -320,7 +320,9 @@
         function onColorPicker(evt) {
             toolBtnColor.active = false;
             // use the bg color of the touched div
-            setCurrentColor(evt.target.style.backgroundColor);
+            if(evt.target.style.backgroundColor) {
+                setCurrentColor(evt.target.style.backgroundColor);
+            }
             
             showColorPicker(false);
 
