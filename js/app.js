@@ -14,7 +14,7 @@
         var currentColor = "#FFF";
         var selectedTool;
 
-        var selectionColor = "#884466"; // applied to the toolbar items
+        var selectionColor = "#88C"; // applied to the toolbar items
         var nonSelectColor = "#000";
 
         var pixelData;
