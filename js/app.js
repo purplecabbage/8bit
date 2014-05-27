@@ -314,7 +314,8 @@
 
         function setCurrentColor(clr) {
             window.localStorage.currentColor = clr;
-            toolBtnColor.style.borderColor = currentColor;
+            toolBtnColor.style.borderBottom = "3px solid " + clr;
+            //toolBar.style.borderBottom = "3px solid " + clr;
         }
 
         function onColorPicker(evt) {
