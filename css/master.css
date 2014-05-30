@@ -129,7 +129,22 @@ body
     background-repeat: no-repeat;
     background-position:center center;
 
+    -webkit-transition:-webkit-transform 600ms ease-in-out;
+    transition:transform 600ms ease-in-out;
+}
 
+
+@-webkit-keyframes bounceInOut {
+  from {
+    -webkit-transform:scale(1);
+  }
+  50% {
+    -webkit-transform:scale(0.5);
+  }
+
+  to {
+    -webkit-transform:scale(1);
+  }
 }
 
 #toolBar.landscape div
@@ -139,6 +154,18 @@ body
     -ms-transform: rotate(90deg);
     -o-transform: rotate(90deg);
     transform: rotate(90deg);
+
+/*    -webkit-animation-duration: 300ms;
+    -webkit-animation-name: bounceInOut;*/
+}
+
+#toolBar.portrait div
+{
+    -webkit-transform: rotate(0);
+    -moz-transform: rotate(0);
+    -ms-transform: rotate(0);
+    -o-transform: rotate(0);
+    transform: rotate(0);
 }
 
 
