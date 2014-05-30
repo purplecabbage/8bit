@@ -429,7 +429,12 @@
             }
         }
 
-        function onToolStart(e) {
+        function onToolStart(evt) {
+
+            var e = digits.canTouch ? evt.touches[0] : evt;
+            // note: clientX is a quick patch, but it is not accurate, need to account for canvas offset
+            var offsetX = e.offsetX || e.clientX;
+            var offsetY = e.offsetY || e.clientY;
 
             if(toolBtnColor.active || toolBtnZoom.active) {
                 return;
@@ -442,8 +447,8 @@
 
             toolActive = true;
 
-            var x = Math.floor( e.offsetX / pixelSize );
-            var y = Math.floor( e.offsetY / pixelSize );
+            var x = Math.floor( offsetX / pixelSize );
+            var y = Math.floor( offsetY / pixelSize );
 
             startX = -1;//x;
             startY = -1;//y;
@@ -457,12 +462,12 @@
                 }], e.timeStamp);
             }
             else if(selectedTool == toolBtnErase) {
-                e.preventDefault();
+                evt.preventDefault();
                 context.save();
                 context.beginPath();
             }
             else { // default is the pen tool
-                e.preventDefault();
+                evt.preventDefault();
                 context.save();
                 context.fillStyle = getCurrentColor();
                 context.beginPath();
@@ -490,15 +495,20 @@
             }
         }
 
-        function onToolMove(e) {
+        function onToolMove(evt) {
 
             // need tool active for mouse-move support
             if(!toolActive) {
                 return;
             }
 
-            var x = Math.floor( e.offsetX / pixelSize );
-            var y = Math.floor( e.offsetY / pixelSize );
+            var e = digits.canTouch ? evt.touches[0] : evt;
+
+            var offsetX = e.offsetX || e.clientX;
+            var offsetY = e.offsetY || e.clientY;
+
+            var x = Math.floor( offsetX / pixelSize );
+            var y = Math.floor( offsetY / pixelSize );
 
             if(selectedTool == toolBtnMove) {
                 scrollerObj.doTouchMove([{
@@ -507,7 +517,7 @@
                 }], e.timeStamp);
             }
             else if(selectedTool == toolBtnErase) {
-                e.preventDefault();
+                evt.preventDefault();
                 if(x != startX || y != startY) {
                     drawPixel(x,y,0);
                     wasPenDrag = true;
@@ -515,7 +525,7 @@
             }
             else {
                 
-                e.preventDefault();
+                evt.preventDefault();
                 if(x != startX || y != startY) {
                     drawPixel(x,y,context.fillStyle);
                     wasPenDrag = true;
@@ -526,8 +536,14 @@
             startY = y;
         }
 
-        function onToolEnd(e) {
+        function onToolEnd(evt) {
             console.log("onToolEnd");
+                        
+            var e = digits.canTouch ? evt.touches[0] : evt;
+
+            var offsetX = e.offsetX || e.clientX;
+            var offsetY = e.offsetY || e.clientY;
+
             container.removeEventListener(digits.move,onToolMove);
             window.removeEventListener(digits.end,  onToolEnd);
 
@@ -539,7 +555,7 @@
                 scrollerObj.doTouchEnd(e.timeStamp);
             }
             else {
-                e.preventDefault();
+                evt.preventDefault();
                 context.closePath(); // finish drawing
             }
 
