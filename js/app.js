@@ -14,7 +14,7 @@
         var currentColor = "#FFF";
         var selectedTool;
 
-        var selectionColor = "#884466"; // applied to the toolbar items
+        var selectionColor = "#88C"; // applied to the toolbar items
         var nonSelectColor = "#000";
 
         var pixelData;
@@ -314,13 +314,16 @@
 
         function setCurrentColor(clr) {
             window.localStorage.currentColor = clr;
-            toolBtnColor.style.borderColor = currentColor;
+            toolBtnColor.style.borderBottom = "3px solid " + clr;
+            //toolBar.style.borderBottom = "3px solid " + clr;
         }
 
         function onColorPicker(evt) {
             toolBtnColor.active = false;
             // use the bg color of the touched div
-            setCurrentColor(evt.target.style.backgroundColor);
+            if(evt.target.style.backgroundColor) {
+                setCurrentColor(evt.target.style.backgroundColor);
+            }
             
             showColorPicker(false);
 
