@@ -215,6 +215,11 @@ body
     background-image:url(../assets/48_close.png);
 }
 
+#toolBtnSave
+{
+    background-image:url(../assets/48_save.png);
+}
+
 #container
 {
 	background-color:#004;
