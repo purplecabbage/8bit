@@ -17,6 +17,7 @@
         var selectionColor = "#88C"; // applied to the toolbar items
         var nonSelectColor = "#000";
 
+        var imageName = "img1"; // used as a key into localStorage 
         var pixelData;
         var pixelSize = 16;
         var zoomRatio = 1.0;
@@ -36,6 +37,7 @@
 
         exports.init = function () {
             
+            loadImage();
             initCanvas();
             initAppBar();
 
@@ -91,7 +93,7 @@
             context.width = 480;//canvasWidth;
             context.height = 580;//canvasHeight;
             
-            clearCanvas();
+            
 
             container.addEventListener(digits.start,onToolStart);
             currentCanvas.addEventListener("click", onToolClick);
@@ -108,6 +110,9 @@
             });
 
             scrollerObj.setDimensions(480,580,480,580);
+            clearCanvas();
+            loadImage();
+            redraw();
             
         }
 
@@ -122,7 +127,6 @@
                     pixelData[i][j] = 0;
                 }
             }
-            redraw();
         }
 
         function redraw() {
@@ -139,7 +143,6 @@
             var pX = Math.ceil(canvasWidth / pixelSize);
             var pY = Math.ceil(canvasHeight / pixelSize);
 
-            console.log("pX = " + pX);
 
             for (var x = 0; x < canvasWidth; x++) {
                 // if pixel x is offscreen, skip it
@@ -164,6 +167,20 @@
             //context.stroke();
             context.closePath();
         }
+
+        function loadImage() {
+
+            var imageData = localStorage[imageName];
+            if(imageData) {
+                pixelData = JSON.parse(imageData);
+            }
+        }
+
+        function saveImage() {
+            var imageData = JSON.stringify(pixelData);
+            localStorage[imageName] = imageData;
+        }
+
 
         function exportImage() {
 
@@ -227,6 +244,10 @@
             }
 
             switch(e.target.id) {
+                case "toolBtnSave" :
+                    saveImage();
+                    return;
+                    break;
                 case "toolBtnMove" : 
                     selectedTool = e.target;
                     break;
