@@ -1,0 +1,25 @@
+{
+  "name": "8bit",
+  "version": "0.0.0",
+  "description": "8bit drawing for mobile",
+  "main": "js/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build" : "browserify js/app.js -o js/appBundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/purplecabbage/8bit.git"
+  },
+  "author": "",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/purplecabbage/8bit/issues"
+  },
+  "homepage": "https://github.com/purplecabbage/8bit",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "browserify": "~4.1.8"
+  }
+}

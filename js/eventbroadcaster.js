@@ -1,10 +1,8 @@
 
-(function(exports){
-    
 
 // install our event system
-exports.EventBroadcaster = function(){};
-exports.EventBroadcaster.prototype = {
+var EventBroadcaster = function(){};
+EventBroadcaster.prototype = {
 
     addEventListener: function(name, callback, bUseCapture)
     {
@@ -58,7 +56,7 @@ exports.EventBroadcaster.prototype = {
 // install EB Methods on an instance:
 // var myEB = {}; EventBroadcaster.mixin(myEB);
 // or to a class :: EventBroadcaster.mixin(MyObj.prototype);
-exports.EventBroadcaster.mixin = function(targ)
+EventBroadcaster.mixin = function(targ)
 {
     targ.addEventListener    = this.prototype.addEventListener;
     targ.dispatchEvent = this.prototype.dispatchEvent;
@@ -66,4 +64,4 @@ exports.EventBroadcaster.mixin = function(targ)
     targ.hasListener    = this.prototype.hasListener;
 }
 
-})(window);
+module.exports = EventBroadcaster;
