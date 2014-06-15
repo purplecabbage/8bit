@@ -64,4 +64,4 @@ EventBroadcaster.mixin = function(targ)
     targ.hasListener    = this.prototype.hasListener;
 }
 
-module.exports = EventBroadcaster;
+//module.exports = EventBroadcaster;

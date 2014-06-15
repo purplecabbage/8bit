@@ -2,7 +2,7 @@
 
 // icons:: https://www.iconfinder.com/search/?q=iconset:jigsoar-icons
 
-var appModel = require("./appModel");
+var appModel = appModel;//require("./appModel");
 
 
 var startX,startY,currentTarget,selectedIndex = 0;
@@ -170,6 +170,8 @@ function redraw() {
 
 function loadImage() {
 
+    //pixelData = appModel.getImageAt(0) || [];
+
     var imageData = localStorage[imageName];
     if(imageData) {
         pixelData = JSON.parse(imageData);
@@ -177,6 +179,8 @@ function loadImage() {
 }
 
 function saveImage() {
+    
+    //appModel.saveImageAt(0,"MyImage",pixelData);
     var imageData = JSON.stringify(pixelData);
     localStorage[imageName] = imageData;
 }
@@ -457,8 +461,12 @@ function onToolStart(evt) {
 
     var e = digits.canTouch ? evt.touches[0] : evt;
     // note: clientX is a quick patch, but it is not accurate, need to account for canvas offset
-    var offsetX = e.offsetX || e.clientX;
+
+    //("e.clientX = " + e.clientX);
+
+    var offsetX = e.offsetX || e.clientX; //container
     var offsetY = e.offsetY || e.clientY;
+
 
     if(toolBtnColor.active || toolBtnZoom.active) {
         return;

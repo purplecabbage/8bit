@@ -38,6 +38,8 @@ var scrollerObj;
 
 window.init = function () {
     
+    window.alert("here comes the init");
+    
     loadImage();
     initCanvas();
     initAppBar();
@@ -458,8 +460,12 @@ function onToolStart(evt) {
 
     var e = digits.canTouch ? evt.touches[0] : evt;
     // note: clientX is a quick patch, but it is not accurate, need to account for canvas offset
-    var offsetX = e.offsetX || e.clientX;
+
+    window.alert("e.clientX = " + e.clientX);
+
+    var offsetX = e.offsetX || e.clientX; //container
     var offsetY = e.offsetY || e.clientY;
+
 
     if(toolBtnColor.active || toolBtnZoom.active) {
         return;

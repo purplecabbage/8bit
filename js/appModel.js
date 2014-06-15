@@ -1,18 +1,25 @@
 
 
-var EB = require("./eventbroadcaster");
+var EB = EventBroadcaster;//require("./eventbroadcaster");
 
-var dataKey = "imageData";
+var dataKey = "imageDataKey";
 
 var getData = function(){
-    return JSON.parse(localStorage[dataKey]);
+    var raw = localStorage[dataKey];
+    if(raw) {
+        return JSON.parse(raw);
+    }
+
+    return null;
 }
 
 var setData = function(data){
     localStorage[dataKey] = JSON.stringify(data);
 }
 
-module.exports.appModel = {
+//module.exports.
+
+var appModel = {
 
     saveImageAt:function(index,title,data){
         var data = getData();
@@ -20,7 +27,8 @@ module.exports.appModel = {
         setData(data);
     },
     getImageAt:function(index){
-        return getData()[index];
+        var all = getData();
+        return all && all[index] ? all[index] : null;
     },
     getImageList:function(){
         var data = getData();
