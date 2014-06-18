@@ -169,9 +169,7 @@ function redraw() {
 }
 
 function loadImage() {
-
     //pixelData = appModel.getImageAt(0) || [];
-
     var imageData = localStorage[imageName];
     if(imageData) {
         pixelData = JSON.parse(imageData);
@@ -179,14 +177,13 @@ function loadImage() {
 }
 
 function saveImage() {
-    
     //appModel.saveImageAt(0,"MyImage",pixelData);
     var imageData = JSON.stringify(pixelData);
     localStorage[imageName] = imageData;
 }
 
-
-function exportImage() {
+// data is expected to be a 2 dimensional array of pixel color values
+function imageFromData(data) {
 
     var w = pixelData.length;
     var h = pixelData[0].length;
@@ -211,12 +208,12 @@ function exportImage() {
     }
 
     var tempCanvas = document.createElement("canvas");
-    var tSty = tempCanvas.style;
-    tSty.position = "absolute";
-    tSty.right = "20px";
-    tSty.bottom = "20px";
-    tSty.border = "solid 1px Red";
-    document.body.appendChild(tempCanvas);
+    // var tSty = tempCanvas.style;
+    // tSty.position = "absolute";
+    // tSty.right = "20px";
+    // tSty.bottom = "20px";
+    // tSty.border = "solid 1px Red";
+    // document.body.appendChild(tempCanvas);
 
     // not sure why the canvas has to be halved, but the image comes out all mucked otherwise.
     tempCanvas.width = w / 2;
@@ -229,6 +226,14 @@ function exportImage() {
     ctx.putImageData(imageData,0,0);
 
     var imgData = tempCanvas.toDataURL("image/png", 1.0);
+
+    return imgData;
+}
+
+
+function exportImage() {
+
+    var imgData = imageFromData(pixelData);
 
     // are we in a cordova app with a saveImageToCameraRoll method?
     try {
