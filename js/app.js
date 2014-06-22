@@ -116,17 +116,21 @@ function initCanvas() {
     
 }
 
+function initPixelData(w,h) {
+    for(var i = 0; i < w; i++) {
+            pixelData[i] = [];
+        for(var j = 0; j < h; j++) {
+            pixelData[i][j] = 0;
+        }
+    }
+}
+
 function clearCanvas() {
     pixelData = [];
     undoStack = [];
     undoSets = [];
 
-    for(var i = 0; i < canvasWidth; i++) {
-            pixelData[i] = [];
-        for(var j = 0; j < canvasHeight; j++) {
-            pixelData[i][j] = 0;
-        }
-    }
+    initPixelData(canvasWidth,canvasHeight);
 }
 
 function redraw() {
@@ -170,6 +174,7 @@ function redraw() {
 
 function loadImage() {
     //pixelData = appModel.getImageAt(0) || [];
+    clearCanvas();
     var imageData = localStorage[imageName];
     if(imageData) {
         pixelData = JSON.parse(imageData);
@@ -513,7 +518,7 @@ function onToolStart(evt) {
 
 function onToolClick(e) {
 
-    console.log("onToolClick");
+    // console.log("onToolClick");
 
     if(!wasPenDrag) { // dragging the pen also fills pixels, so we ignore click events if the 'pen' moved
 
