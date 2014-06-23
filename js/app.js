@@ -37,9 +37,10 @@ var scrollerObj;
 
 window.init = function () {
     
-    loadImage();
     initCanvas();
     initAppBar();
+    loadImage();
+
 
     window.addEventListener("resize",debounce(onResize,200));
 
@@ -71,17 +72,23 @@ function initAppBar() {
     onToolBtn({target:btns[0]});
     clrPicker.onclick = onColorPicker;
 
-    divZoomOut.addEventListener(digits.end,function(e){
+    var onZoomOutBtn = function(e) {
         e.preventDefault();
         e.cancelBubble = true;
-        doZoom(-1);
-    });
+        doZoom(-1);  
+    };
 
-    divZoomIn.addEventListener(digits.end,function(e){
+    var onZoomInBtn = function(e) {
         e.preventDefault();
         e.cancelBubble = true;
         doZoom(1);
-    });
+    };
+
+    divZoomOut.addEventListener("mouseup",onZoomOutBtn);
+    divZoomOut.addEventListener("touchend",onZoomOutBtn);
+
+    divZoomIn.addEventListener("mouseup",onZoomInBtn);
+    divZoomIn.addEventListener("touchend",onZoomInBtn);
 
     zoomVal.innerText = zoomRatio;
 }
@@ -92,10 +99,10 @@ function initCanvas() {
     context = currentCanvas.getContext('2d');
     context.width = 480;//canvasWidth;
     context.height = 580;//canvasHeight;
-    
-    
 
-    container.addEventListener(digits.start,onToolStart);
+    container.addEventListener("mousedown",onToolStart);
+    container.addEventListener("touchstart",onToolStart);
+
     currentCanvas.addEventListener("click", onToolClick);
 
     scrollerObj = new Scroller(function(left, top, zoom) {
@@ -110,9 +117,6 @@ function initCanvas() {
     });
 
     scrollerObj.setDimensions(480,580,480,580);
-    clearCanvas();
-    loadImage();
-    redraw();
     
 }
 
@@ -175,10 +179,11 @@ function redraw() {
 function loadImage() {
     //pixelData = appModel.getImageAt(0) || [];
     clearCanvas();
-    var imageData = localStorage[imageName];
+    var imageData = localStorage[imageName] || []
     if(imageData) {
         pixelData = JSON.parse(imageData);
     }
+    redraw();
 }
 
 function saveImage() {
@@ -319,11 +324,13 @@ function onToolBtn(e)
 
 function showZoomControls(bShow) {
     if(bShow) {
-        document.body.addEventListener(digits.end,removeSelection);
+        document.body.addEventListener("mouseup",removeSelection);
+        document.body.addEventListener("touchend",removeSelection);
         zoomBar.style.display = "table";
     }
     else {
-        document.body.removeEventListener(digits.end,removeSelection);
+        document.body.removeEventListener("mouseup",removeSelection);
+        document.body.removeEventListener("touchend",removeSelection);
         zoomBar.style.display = "none";
     }
 }
@@ -410,10 +417,12 @@ function showColorPicker(bShow)
 
     if(bShow) {
         document.body.addEventListener("mouseup",removeSelection);
+        document.body.addEventListener("touchend",removeSelection);
         clrPicker.style.display = "block";
     }
     else {
         document.body.removeEventListener("mouseup",removeSelection);
+        document.body.removeEventListener("touchend",removeSelection);
         clrPicker.style.display = "none";
     }
 }
@@ -469,7 +478,7 @@ function doUndoable() {
 
 function onToolStart(evt) {
 
-    var e = digits.canTouch ? evt.touches[0] : evt;
+    var e = evt.touches ? evt.touches[0] : evt;
     // note: clientX is a quick patch, but it is not accurate, need to account for canvas offset
 
     //("e.clientX = " + e.clientX);
@@ -483,9 +492,19 @@ function onToolStart(evt) {
     }
 
     undoSets.push(undoStack.length);
-
-    container.addEventListener(digits.move,onToolMove);
-    window.addEventListener(digits.end,  onToolEnd);
+    if(evt.type == "mousedown") {
+        container.addEventListener("mousemove",onToolMove);
+        window.addEventListener("mouseup",  onToolEnd);
+    }
+    else {
+        container.addEventListener("touchmove",onToolMove);
+        window.addEventListener("touchend",  onToolEnd);
+    }
+    
+    
+    
+    
+    
 
     toolActive = true;
 
@@ -544,7 +563,7 @@ function onToolMove(evt) {
         return;
     }
 
-    var e = digits.canTouch ? evt.touches[0] : evt;
+    var e = evt.touches ? evt.touches[0] : evt;
 
     var offsetX = e.offsetX || e.clientX;
     var offsetY = e.offsetY || e.clientY;
@@ -581,13 +600,19 @@ function onToolMove(evt) {
 function onToolEnd(evt) {
     console.log("onToolEnd");
                 
-    var e = digits.canTouch ? evt.touches[0] : evt;
+    var e = evt.touches ? evt.touches[0] : evt;
 
     var offsetX = e.offsetX || e.clientX;
     var offsetY = e.offsetY || e.clientY;
 
-    container.removeEventListener(digits.move,onToolMove);
-    window.removeEventListener(digits.end,  onToolEnd);
+    if(evt.type == "mouseup") {
+        container.removeEventListener("mousemove",onToolMove);
+        window.removeEventListener("mouseup",  onToolEnd);
+    }
+    else {
+        container.removeEventListener("touchmove",onToolMove);
+        window.removeEventListener("touchend",  onToolEnd);
+    }
 
     toolActive = false; 
     startX = -1;
