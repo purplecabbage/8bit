@@ -340,10 +340,14 @@ function doZoom(dir) {
     zoomRatio += dir;
     
     if(zoomRatio > maxZoom) {
-        zoomRatio = minZoom;
+        //zoomRatio = minZoom;
+        zoomRatio = maxZoom;
+        return;
     }
     else if(zoomRatio < minZoom) {
-        zoomRatio = maxZoom;
+        //zoomRatio = maxZoom;
+        zoomRatio = minZoom;
+        return;
     }
     zoomVal.innerText = zoomRatio;
 
@@ -486,12 +490,12 @@ function onToolStart(evt) {
     var offsetX = e.offsetX || e.clientX; //container
     var offsetY = e.offsetY || e.clientY;
 
-
     if(toolBtnColor.active || toolBtnZoom.active) {
         return;
     }
 
     undoSets.push(undoStack.length);
+
     if(evt.type == "mousedown") {
         container.addEventListener("mousemove",onToolMove);
         window.addEventListener("mouseup",  onToolEnd);
@@ -500,19 +504,14 @@ function onToolStart(evt) {
         container.addEventListener("touchmove",onToolMove);
         window.addEventListener("touchend",  onToolEnd);
     }
-    
-    
-    
-    
-    
 
     toolActive = true;
 
     var x = Math.floor( offsetX / pixelSize );
     var y = Math.floor( offsetY / pixelSize );
 
-    startX = -1;//x;
-    startY = -1;//y;
+    startX = offsetX;
+    startY = offsetY;
 
     wasPenDrag = false;
 
@@ -585,11 +584,20 @@ function onToolMove(evt) {
         }
     }
     else {
-        
         evt.preventDefault();
+        wasPenDrag = true;
+        // ctrl key to mimic multitouch pinch+zoom
+        if(evt.ctrlKey) {
+            var dY = startY - y;
+            if(Math.abs(dY / 10) > 1) {
+                doZoom(Math.round(dY / 10));
+                startX = x;
+                startY = y;
+            }
+            return;
+        }
         if(x != startX || y != startY) {
             drawPixel(x,y,context.fillStyle);
-            wasPenDrag = true;
         }
     }
 
