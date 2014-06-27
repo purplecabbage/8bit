@@ -63,12 +63,12 @@ function initAppBar() {
 
     setCurrentColor(getCurrentColor());
 
-    var btns = document.querySelectorAll("#toolBar div");
+    var btns = appBar.btns = document.querySelectorAll("#toolBar div");
     for(var n = 0; n<btns.length; n++) {
         console.log("adding click handler for " + n);
         btns[n].addEventListener('click',onToolBtn);
     }
-    
+    appBar.selectedTool = btns[0];
     onToolBtn({target:btns[0]});
     clrPicker.onclick = onColorPicker;
 
@@ -256,84 +256,14 @@ function exportImage() {
 
 function onToolBtn(e)
 {
+    // remove selection from all buttons
+    //appBar.clearSelection();
 
-    var btns = document.querySelectorAll("#toolBar div");
-    for(var n = 0; n<btns.length; n++) {
-        btns[n].style.backgroundColor = nonSelectColor;
-    }
+    appBar['on' + e.target.id](e);
 
-    switch(e.target.id) {
-        case "toolBtnSave" :
-            saveImage();
-            return;
-            break;
-        case "toolBtnMove" : 
-            selectedTool = e.target;
-            break;
-        case "toolBtnUndo" : 
-            // undo tool should not affect the active tool, it is an action
-            undoSet();
-            break;
-        case "toolBtnColor" : 
-            if(e.target.active) {
-                e.target.active = false;
-                showColorPicker(false);
-                e.target.style.backgroundColor = nonSelectColor;
-                return;
-            }
-            else {
-                e.target.active = true;
-                e.target.style.backgroundColor = selectionColor;
-                showColorPicker(true);
-            }
-            break;
-        case "toolBtnExport":
-            exportImage();
-            break;
-        case "toolBtnSettings": 
-            break;
-        case "toolBtnDraw" : 
-            selectedTool = e.target;
-            break;
-        case "toolBtnErase" : 
-            selectedTool = e.target;
-            break;                    
-        case "toolBtnDelete" : 
-            // delete all does not affect the current tool
-            clearCanvas();
-            redraw();
-            break;
-        case "toolBtnZoom" :
-            if(e.target.active) {
-                e.target.active = false;
-                showZoomControls(false);
-                e.target.style.backgroundColor = nonSelectColor;
-            }
-            else {
-                e.target.active = true;
-                showZoomControls(true);
-                e.target.style.backgroundColor = selectionColor;
-            }
-            break;
-    }
+    // redraw selection on active tool button
 
-    selectedTool.active = true;
-    selectedTool.style.backgroundColor = selectionColor;
-
-}
-
-
-function showZoomControls(bShow) {
-    if(bShow) {
-        document.body.addEventListener("mouseup",removeSelection);
-        document.body.addEventListener("touchend",removeSelection);
-        zoomBar.style.display = "table";
-    }
-    else {
-        document.body.removeEventListener("mouseup",removeSelection);
-        document.body.removeEventListener("touchend",removeSelection);
-        zoomBar.style.display = "none";
-    }
+    appBar.resetSelection();
 }
 
 function doZoom(dir) {
@@ -373,7 +303,6 @@ function onColorPicker(evt) {
     }
     
     showColorPicker(false);
-
 }
 
 function removeSelection() {
@@ -383,7 +312,7 @@ function removeSelection() {
         toolBtnColor.active = false;
         showColorPicker(false);
         toolBtnZoom.active = false;
-        showZoomControls(false);
+        appBar.showZoomControls(false);
     },10);
 }
 
