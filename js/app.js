@@ -12,7 +12,6 @@ var toolActive = false;
 var wasPenDrag = false;
 var wasMove = false;
 var currentColor = "#FFF";
-var selectedTool;
 
 var selectionColor = "#88C"; // applied to the toolbar items
 var nonSelectColor = "#000";
@@ -445,13 +444,13 @@ function onToolStart(evt) {
 
     wasPenDrag = false;
 
-    if(selectedTool == toolBtnMove) {
+    if(appBar.selectedTool == toolBtnMove) {
         scrollerObj.doTouchStart([{
             pageX: e.pageX,
             pageY: e.pageY
         }], e.timeStamp);
     }
-    else if(selectedTool == toolBtnErase) {
+    else if(appBar.selectedTool == toolBtnErase) {
         evt.preventDefault();
         context.save();
         context.beginPath();
@@ -473,10 +472,10 @@ function onToolClick(e) {
         var x = Math.floor( e.offsetX / pixelSize );
         var y = Math.floor( e.offsetY / pixelSize );
 
-        if(selectedTool == toolBtnErase) {
+        if(appBar.selectedTool == toolBtnErase) {
             drawPixel(x,y,0);
         }
-        else if(selectedTool == toolBtnMove) {
+        else if(appBar.selectedTool == toolBtnMove) {
             // click should do nothing for move tool
         }
         else {
@@ -500,13 +499,13 @@ function onToolMove(evt) {
     var x = Math.floor( offsetX / pixelSize );
     var y = Math.floor( offsetY / pixelSize );
 
-    if(selectedTool == toolBtnMove) {
+    if(appBar.selectedTool == toolBtnMove) {
         scrollerObj.doTouchMove([{
             pageX: e.pageX,
             pageY: e.pageY
         }], e.timeStamp);
     }
-    else if(selectedTool == toolBtnErase) {
+    else if(appBar.selectedTool == toolBtnErase) {
         evt.preventDefault();
         if(x != startX || y != startY) {
             drawPixel(x,y,0);
@@ -556,7 +555,7 @@ function onToolEnd(evt) {
     startX = -1;
     startY = -1;
 
-    if(selectedTool == toolBtnMove) {
+    if(appBar.selectedTool == toolBtnMove) {
         scrollerObj.doTouchEnd(e.timeStamp);
     }
     else {
