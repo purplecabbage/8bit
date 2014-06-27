@@ -41,8 +41,6 @@ var appBar = {
         this.selectedTool = e.target;
     },
 
- 
-
     ontoolBtnColor: function ontoolBtnColor(e) {
         if(e.target.active) {
             e.target.active = false;
@@ -54,6 +52,23 @@ var appBar = {
             e.target.active = true;
             e.target.style.backgroundColor = this.selectionColor;
             this.showColorPicker(true);
+        }
+    },
+
+    showColorPicker: function showColorPicker(bShow) {
+        if(clrPicker.children.length == 0) {
+            this.createColorPicker();
+        }
+
+        if(bShow) {
+            document.body.addEventListener("mouseup",this.removeSelection);
+            document.body.addEventListener("touchend",this.removeSelection);
+            clrPicker.style.display = "block";
+        }
+        else {
+            document.body.removeEventListener("mouseup",this.removeSelection);
+            document.body.removeEventListener("touchend",this.removeSelection);
+            clrPicker.style.display = "none";
         }
     },
 
@@ -99,20 +114,30 @@ var appBar = {
         },10);
     },
 
-    showColorPicker: function showColorPicker(bShow) {
-        if(clrPicker.children.length == 0) {
-            createColorPicker();
+    createColorPicker: function createColorPicker() {
+        var pre = [0,128,256];
+        var colors = [];
+        var stride = pre.length;
+
+        for(var b = 0; b < stride; b++) {
+            for(var g = 0; g < stride; g++) {
+                for(var r = 0; r < stride; r++) {
+                    colors.push("rgba(" + pre[r] + "," + pre[g] + "," + pre[b] + ",1.0)");
+                    colors.push("rgba(" + pre[r]/2 + "," + pre[g]/2 + "," + pre[b] /2+ ",1.0)");  
+                }
+            }
         }
 
-        if(bShow) {
-            document.body.addEventListener("mouseup",this.removeSelection);
-            document.body.addEventListener("touchend",this.removeSelection);
-            clrPicker.style.display = "block";
-        }
-        else {
-            document.body.removeEventListener("mouseup",this.removeSelection);
-            document.body.removeEventListener("touchend",this.removeSelection);
-            clrPicker.style.display = "none";
+        colors = colors.filter(function(elem, pos) {
+            return colors.indexOf(elem) == pos;
+        });
+
+        colors.sort();
+            
+        for(var n = 0; n < colors.length; n++) {
+            var elem = document.createElement("div");
+            elem.style.backgroundColor = colors[n];
+            clrPicker.appendChild(elem);
         }
     }
 }

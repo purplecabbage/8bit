@@ -304,32 +304,7 @@ function onColorPicker(evt) {
 
 
 
-function createColorPicker() {
-    var pre = [0,128,256];
-    var colors = [];
-    var stride = pre.length;
 
-    for(var b = 0; b < stride; b++) {
-        for(var g = 0; g < stride; g++) {
-            for(var r = 0; r < stride; r++) {
-                colors.push("rgba(" + pre[r] + "," + pre[g] + "," + pre[b] + ",1.0)");
-                colors.push("rgba(" + pre[r]/2 + "," + pre[g]/2 + "," + pre[b] /2+ ",1.0)");  
-            }
-        }
-    }
-
-    colors = colors.filter(function(elem, pos) {
-        return colors.indexOf(elem) == pos;
-    });
-
-    colors.sort();
-        
-    for(var n = 0; n < colors.length; n++) {
-        var elem = document.createElement("div");
-        elem.style.backgroundColor = colors[n];
-        clrPicker.appendChild(elem);
-    }
-}
 
 
 
