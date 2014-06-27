@@ -179,7 +179,7 @@ function redraw() {
 function loadImage() {
     //pixelData = appModel.getImageAt(0) || [];
     clearCanvas();
-    var imageData = localStorage[imageName] || []
+    var imageData = localStorage[imageName];
     if(imageData) {
         pixelData = JSON.parse(imageData);
     }
@@ -301,6 +301,7 @@ function onToolBtn(e)
         case "toolBtnDelete" : 
             // delete all does not affect the current tool
             clearCanvas();
+            redraw();
             break;
         case "toolBtnZoom" :
             if(e.target.active) {
