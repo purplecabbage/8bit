@@ -13,9 +13,6 @@ var wasPenDrag = false;
 var wasMove = false;
 var currentColor = "#FFF";
 
-var selectionColor = "#88C"; // applied to the toolbar items
-var nonSelectColor = "#000";
-
 var imageName = "img1"; // used as a key into localStorage 
 var pixelData;
 var pixelSize = 16;
@@ -304,16 +301,7 @@ function onColorPicker(evt) {
     showColorPicker(false);
 }
 
-function removeSelection() {
 
-    toolBtnColor.style.backgroundColor = "#000";
-    setTimeout(function(){
-        toolBtnColor.active = false;
-        showColorPicker(false);
-        toolBtnZoom.active = false;
-        appBar.showZoomControls(false);
-    },10);
-}
 
 function createColorPicker() {
     var pre = [0,128,256];
@@ -342,23 +330,7 @@ function createColorPicker() {
     }
 }
 
-function showColorPicker(bShow)
-{
-    if(clrPicker.children.length == 0) {
-        createColorPicker();
-    }
 
-    if(bShow) {
-        document.body.addEventListener("mouseup",removeSelection);
-        document.body.addEventListener("touchend",removeSelection);
-        clrPicker.style.display = "block";
-    }
-    else {
-        document.body.removeEventListener("mouseup",removeSelection);
-        document.body.removeEventListener("touchend",removeSelection);
-        clrPicker.style.display = "none";
-    }
-}
 
 //returns true if the color value has changed
 function setPixelColor(x,y,clr,noUndo) {
@@ -397,6 +369,7 @@ function undoSet() {
             doUndoable();
         }
     }
+    appBar.enableUndoBtn(undoSets.length);
 }
 
 function doUndoable() {

@@ -1,14 +1,17 @@
 
 var appBar = {
 
+    selectionColor: "#88C", // applied to the toolbar items
+    nonSelectColor: "#000",
+
     resetSelection: function resetSelection(tool) {
         var btns = this.btns;
         for(var n = 0; n<btns.length; n++) {
-            btns[n].style.backgroundColor = nonSelectColor;
+            btns[n].style.backgroundColor = this.nonSelectColor;
         }
 
         this.selectedTool.active = true;
-        this.selectedTool.style.backgroundColor = selectionColor;
+        this.selectedTool.style.backgroundColor = this.selectionColor;
     },
 
     ontoolBtnDraw: function ontoolBtnDraw(e) {
@@ -44,14 +47,14 @@ var appBar = {
     ontoolBtnColor: function ontoolBtnColor(e) {
         if(e.target.active) {
             e.target.active = false;
-            showColorPicker(false);
-            e.target.style.backgroundColor = nonSelectColor;
+            this.showColorPicker(false);
+            e.target.style.backgroundColor = this.nonSelectColor;
             return;
         }
         else {
             e.target.active = true;
-            e.target.style.backgroundColor = selectionColor;
-            showColorPicker(true);
+            e.target.style.backgroundColor = this.selectionColor;
+            this.showColorPicker(true);
         }
     },
 
@@ -59,27 +62,58 @@ var appBar = {
         if(e.target.active) {
             e.target.active = false;
             this.showZoomControls(false);
-            e.target.style.backgroundColor = nonSelectColor;
+            e.target.style.backgroundColor = this.nonSelectColor;
         }
         else {
             e.target.active = true;
             this.showZoomControls(true);
-            e.target.style.backgroundColor = selectionColor;
+            e.target.style.backgroundColor = this.selectionColor;
         }
     },
 
 
     showZoomControls: function showZoomControls(bShow) {
         if(bShow) {
-            document.body.addEventListener("mouseup",removeSelection);
-            document.body.addEventListener("touchend",removeSelection);
+            document.body.addEventListener("mouseup",this.removeSelection);
+            document.body.addEventListener("touchend",this.removeSelection);
             zoomBar.style.display = "table";
         }
         else {
-            document.body.removeEventListener("mouseup",removeSelection);
-            document.body.removeEventListener("touchend",removeSelection);
+            document.body.removeEventListener("mouseup",this.removeSelection);
+            document.body.removeEventListener("touchend",this.removeSelection);
             zoomBar.style.display = "none";
         }
-    }
+    },
 
+    enableUndoBtn: function enableUndoBtn(bEnable) {
+        toolBtnUndo.enabled = bEnable;
+    },
+
+    removeSelection: function removeSelection() {
+
+        toolBtnColor.style.backgroundColor = "#000";
+        setTimeout(function(){
+            toolBtnColor.active = false;
+            appBar.showColorPicker(false);
+            toolBtnZoom.active = false;
+            appBar.showZoomControls(false);
+        },10);
+    },
+
+    showColorPicker: function showColorPicker(bShow) {
+        if(clrPicker.children.length == 0) {
+            createColorPicker();
+        }
+
+        if(bShow) {
+            document.body.addEventListener("mouseup",this.removeSelection);
+            document.body.addEventListener("touchend",this.removeSelection);
+            clrPicker.style.display = "block";
+        }
+        else {
+            document.body.removeEventListener("mouseup",this.removeSelection);
+            document.body.removeEventListener("touchend",this.removeSelection);
+            clrPicker.style.display = "none";
+        }
+    }
 }
