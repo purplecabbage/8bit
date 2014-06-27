@@ -59,14 +59,27 @@ function initAppBar() {
 
     setCurrentColor(getCurrentColor());
 
-    var btns = appBar.btns = document.querySelectorAll("#toolBar div");
-    for(var n = 0; n<btns.length; n++) {
-        console.log("adding click handler for " + n);
-        btns[n].addEventListener('click',onToolBtn);
-    }
-    appBar.selectedTool = btns[0];
-    onToolBtn({target:btns[0]});
+    appBar.init();
+
     clrPicker.onclick = onColorPicker;
+
+    appBar.ontoolBtnDelete = function ontoolBtnDelete(e) {
+        // delete all does not affect the current tool
+        clearCanvas();
+        redraw();
+    };
+
+    appBar.ontoolBtnExport = function ontoolBtnExport(e) {
+        exportImage();
+    };
+
+    appBar.ontoolBtnUndo = function ontoolBtnUndo(e) {
+        undoSet();
+    };
+
+    appBar.ontoolBtnSave = function ontoolBtnSave(e) {
+        saveImage();
+    };
 
     var onZoomOutBtn = function(e) {
         e.preventDefault();
@@ -248,18 +261,6 @@ function exportImage() {
     catch(e) {
         window.open(imgData);
     }
-}
-
-function onToolBtn(e)
-{
-    // remove selection from all buttons
-    //appBar.clearSelection();
-
-    appBar['on' + e.target.id](e);
-
-    // redraw selection on active tool button
-
-    appBar.resetSelection();
 }
 
 function doZoom(dir) {

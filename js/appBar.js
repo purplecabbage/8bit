@@ -4,6 +4,21 @@ var appBar = {
     selectionColor: "#88C", // applied to the toolbar items
     nonSelectColor: "#000",
 
+    init: function() {
+        this.btns = document.querySelectorAll("#toolBar div");
+        var onToolBtn = function(e) {
+            appBar['on' + e.target.id](e);
+            appBar.resetSelection();
+        };
+        for(var n = 0; n<this.btns.length; n++) {
+            this.btns[n].addEventListener('click',onToolBtn);
+        }
+        this.selectedTool = this.btns[0];
+        setTimeout(function(){
+            onToolBtn({target:appBar.btns[0]});
+        },0);
+    },
+
     resetSelection: function resetSelection(tool) {
         var btns = this.btns;
         for(var n = 0; n<btns.length; n++) {
@@ -26,23 +41,7 @@ var appBar = {
         this.selectedTool = e.target;
     },
 
-    ontoolBtnDelete: function ontoolBtnDelete(e) {
-        // delete all does not affect the current tool
-        clearCanvas();
-        redraw();
-    },
-
-    ontoolBtnExport: function ontoolBtnExport(e) {
-        exportImage();
-    },
-
-    ontoolBtnUndo: function ontoolBtnUndo(e) {
-        undoSet();
-    },
-
-    ontoolBtnSave: function ontoolBtnSave(e) {
-        saveImage();
-    },
+ 
 
     ontoolBtnColor: function ontoolBtnColor(e) {
         if(e.target.active) {
