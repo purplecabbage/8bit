@@ -116,7 +116,7 @@ body
 #toolBar div
 {
     background-color:#99F;
-    border:solid 1px rgba(0,0,0,1.0);
+    border:solid 1px rgba(255,255,255,0.1);
     margin:0 auto;
     padding:4px 2px;
     display:table-cell;
@@ -128,6 +128,7 @@ body
     text-align:center;
     background-repeat: no-repeat;
     background-position:center center;
+    background-size:60%;
 
     -webkit-transition:-webkit-transform 600ms ease-in-out;
     transition:transform 600ms ease-in-out;
