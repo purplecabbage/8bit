@@ -1,27 +1,27 @@
 
 (function(exports){
 
-var context; // the stored context
+    var context; // the stored context
 
-exports.penTool = {
+    exports.penTool = {
 
-    init:function(_context) {
-        context = _context;
-    },
-    onToolStart:function(evt) {
+        init:function(_context) {
+            context = _context;
+        },
+        onToolStart:function(evt) {
 
-    },
-    onToolMove:function(evt) {
+        },
+        onToolMove:function(evt) {
 
-    },
-    onToolEnd:function(evt) {
+        },
+        onToolEnd:function(evt) {
 
-    },
-    setColor:function(strColor) {
-        
-    }
+        },
+        setColor:function(strColor) {
+            
+        }
 
-};
+    };
 
 
 

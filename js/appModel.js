@@ -17,8 +17,6 @@ var setData = function(data){
     localStorage[dataKey] = JSON.stringify(data);
 }
 
-//module.exports.
-
 var appModel = {
 
     saveImageAt:function(index,title,data){
