@@ -33,6 +33,7 @@ var scrollerObj;
 
 window.init = function () {
     
+
     initCanvas();
     initAppBar();
     loadImage();
@@ -178,27 +179,21 @@ function redraw() {
             }
             
             context.fillRect(adjX * pixelSize, adjY * pixelSize, pixelSize, pixelSize);
-            //context.strokeRect(adjX * pixelSize, adjY * pixelSize, pixelSize, pixelSize);
         }
     }
-    //context.stroke();
     context.closePath();
 }
 
 function loadImage() {
-    //pixelData = appModel.getImageAt(0) || [];
+    var savedImage = appModel.getImageAt(0);
     clearCanvas();
-    var imageData = localStorage[imageName];
-    if(imageData) {
-        pixelData = JSON.parse(imageData);
-    }
+    pixelData = savedImage ? savedImage.data : [];
     redraw();
 }
 
 function saveImage() {
-    //appModel.saveImageAt(0,"MyImage",pixelData);
-    var imageData = JSON.stringify(pixelData);
-    localStorage[imageName] = imageData;
+    // TODO: name and index
+    appModel.saveImageAt(0,"MyImage",pixelData);
 }
 
 // data is expected to be a 2 dimensional array of pixel color values

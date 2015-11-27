@@ -6,11 +6,7 @@ var dataKey = "imageDataKey";
 
 var getData = function(){
     var raw = localStorage[dataKey];
-    if(raw) {
-        return JSON.parse(raw);
-    }
-
-    return null;
+    return raw ? JSON.parse(raw) : [];
 }
 
 var setData = function(data){
@@ -19,10 +15,10 @@ var setData = function(data){
 
 var appModel = {
 
-    saveImageAt:function(index,title,data){
-        var data = getData();
-        data[index] = {title:title,data:data};
-        setData(data);
+    saveImageAt:function(index,title,_data){
+        var store = getData();
+        store[index] = {title:title,data:_data};
+        setData(store);
     },
     getImageAt:function(index){
         var all = getData();
