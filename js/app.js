@@ -171,7 +171,7 @@ function redraw() {
 
             // if pixel.y is onscreen, draw it
             // if it has pixel data, fill it, otherwise draw the grid
-            if(pixelData[x][y]) {
+            if(pixelData[x] && pixelData[x][y]) {
                 context.fillStyle = pixelData[x][y];
             }
             else {
@@ -306,6 +306,10 @@ function onColorPicker(evt) {
 //returns true if the color value has changed
 function setPixelColor(x,y,clr,noUndo) {
     // ignore if the pixel is not changing colors.
+    if(!pixelData[x]) {
+        pixelData[x] = [];
+    }
+
     if(pixelData[x][y] != clr) {
         if (!noUndo) {
             undoStack.push({ x: x, y: y, clr: pixelData[x][y] });
