@@ -13,7 +13,7 @@ var wasPenDrag = false;
 var wasMove = false;
 var currentColor = "#FFF";
 
-var imageName = "img1"; // used as a key into localStorage 
+var imageName = "img1"; // used as a key into localStorage
 var pixelData;
 var pixelSize = 16;
 var zoomRatio = 1.0;
@@ -32,7 +32,6 @@ var undoSets = [];
 var scrollerObj;
 
 window.init = function () {
-    
 
     initCanvas();
     initAppBar();
@@ -50,7 +49,7 @@ window.init = function () {
 
 function onResize(){
     var className = (window.innerWidth > window.innerHeight) ?
-                    "landscape" : "portrait"; 
+                    "landscape" : "portrait";
     if(toolBar.className != className) {
         toolBar.className = className;
     }
@@ -85,7 +84,7 @@ function initAppBar() {
     var onZoomOutBtn = function(e) {
         e.preventDefault();
         e.cancelBubble = true;
-        doZoom(-1);  
+        doZoom(-1);
     };
 
     var onZoomInBtn = function(e) {
@@ -110,8 +109,8 @@ function initCanvas() {
     context.width = 480;//canvasWidth;
     context.height = 580;//canvasHeight;
 
-    container.addEventListener("mousedown",onToolStart);
-    container.addEventListener("touchstart",onToolStart);
+    currentCanvas.addEventListener("mousedown",onToolStart);
+    currentCanvas.addEventListener("touchstart",onToolStart);
 
     currentCanvas.addEventListener("click", onToolClick);
 
@@ -119,7 +118,7 @@ function initCanvas() {
         // apply coordinates/zooming
         //console.log(left + " : " + top + " : " + zoom);
         render(left,top,zoom);
-    }, 
+    },
     {
         zooming :true,
         maxZoom:8,
@@ -127,7 +126,7 @@ function initCanvas() {
     });
 
     scrollerObj.setDimensions(480,580,480,580);
-    
+
 }
 
 function initPixelData(w,h) {
@@ -155,7 +154,7 @@ function redraw() {
     context.clearRect(0,0,480,580);//canvasWidth,canvasHeight);
 
     context.fillStyle = "#000";
-    //context.strokeStyle = "#333";
+    context.strokeStyle = "#333";
     context.beginPath();
 
     var pX = Math.ceil(canvasWidth / pixelSize);
@@ -177,7 +176,7 @@ function redraw() {
             else {
                 context.fillStyle = ( (x % 2 ^ y % 2) ? "#000" : "#333");
             }
-            
+
             context.fillRect(adjX * pixelSize, adjY * pixelSize, pixelSize, pixelSize);
         }
     }
@@ -261,7 +260,7 @@ function exportImage() {
 function doZoom(dir) {
 
     zoomRatio += dir;
-    
+
     if(zoomRatio > maxZoom) {
         //zoomRatio = minZoom;
         zoomRatio = maxZoom;
@@ -293,7 +292,7 @@ function onColorPicker(evt) {
     if(evt.target.style.backgroundColor) {
         setCurrentColor(evt.target.style.backgroundColor);
     }
-    
+
     showColorPicker(false);
 }
 
@@ -364,7 +363,7 @@ function onToolStart(evt) {
 
     //("e.clientX = " + e.clientX);
 
-    var offsetX = e.offsetX || e.clientX; //container
+    var offsetX = e.offsetX || e.clientX;
     var offsetY = e.offsetY || e.clientY;
 
     if(toolBtnColor.active || toolBtnZoom.active) {
@@ -374,18 +373,18 @@ function onToolStart(evt) {
     undoSets.push(undoStack.length);
 
     if(evt.type == "mousedown") {
-        container.addEventListener("mousemove",onToolMove);
+        currentCanvas.addEventListener("mousemove",onToolMove);
         window.addEventListener("mouseup",  onToolEnd);
     }
     else {
-        container.addEventListener("touchmove",onToolMove);
+        currentCanvas.addEventListener("touchmove",onToolMove);
         window.addEventListener("touchend",  onToolEnd);
     }
 
     toolActive = true;
 
-    var x = Math.floor( offsetX / pixelSize );
-    var y = Math.floor( offsetY / pixelSize );
+    // var x = Math.floor( offsetX / pixelSize );
+    // var y = Math.floor( offsetY / pixelSize );
 
     startX = offsetX;
     startY = offsetY;
@@ -441,11 +440,12 @@ function onToolMove(evt) {
 
     var e = evt.touches ? evt.touches[0] : evt;
 
+    //alert('clientX=' + currentCanvas.offsetTop);
     var offsetX = e.offsetX || e.clientX;
     var offsetY = e.offsetY || e.clientY;
 
     var x = Math.floor( offsetX / pixelSize );
-    var y = Math.floor( offsetY / pixelSize );
+    var y = Math.floor( offsetY / pixelSize );// - currentCanvas.offsetTop;
 
     if(appBar.selectedTool == toolBtnMove) {
         scrollerObj.doTouchMove([{
@@ -484,22 +484,22 @@ function onToolMove(evt) {
 
 function onToolEnd(evt) {
     console.log("onToolEnd");
-                
+
     var e = evt.touches ? evt.touches[0] : evt;
 
     var offsetX = e.offsetX || e.clientX;
     var offsetY = e.offsetY || e.clientY;
 
     if(evt.type == "mouseup") {
-        container.removeEventListener("mousemove",onToolMove);
+        currentCanvas.removeEventListener("mousemove",onToolMove);
         window.removeEventListener("mouseup",  onToolEnd);
     }
     else {
-        container.removeEventListener("touchmove",onToolMove);
+        currentCanvas.removeEventListener("touchmove",onToolMove);
         window.removeEventListener("touchend",  onToolEnd);
     }
 
-    toolActive = false; 
+    toolActive = false;
     startX = -1;
     startY = -1;
 
